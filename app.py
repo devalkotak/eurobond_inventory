@@ -16,9 +16,11 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',
 )
 
-INVENTORY_DB = 'inventory.db'
-USERS_DB = 'users.db'
-LOG_DB = 'log.db'
+# Define the data directory for Render's persistent disk
+DATA_DIR = os.environ.get('RENDER_DATA_DIR', '.')
+INVENTORY_DB = os.path.join(DATA_DIR, 'inventory.db')
+USERS_DB = os.path.join(DATA_DIR, 'users.db')
+LOG_DB = os.path.join(DATA_DIR, 'log.db')
 
 # --- Database Helper Functions ---
 def get_db(db_name):
