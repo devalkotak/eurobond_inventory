@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EUROBOND Inventory Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        html.dark {
+            --bg-color: #181A20;
+            --card-bg-color: #23262F;
+            --text-color: #FFFFFF;
+            --secondary-text-color: #A3A8B8;
+            --border-color: #2D303A;
+            --input-bg-color: #2D303A;
+        }
+        html {
+            --bg-color: #F3F4F6;
+            --card-bg-color: #FFFFFF;
+            --text-color: #1F2937;
+            --secondary-text-color: #6B7280;
+            --border-color: #D1D5DB;
+            --input-bg-color: #FFFFFF;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .login-card {
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+        }
+        .btn-primary {
+            background-color: #1E90FF;
+            color: #FFFFFF;
+        }
+        .btn-primary:hover {
+            background-color: #1A7DD5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fixed top-4 right-4 z-50">
+        <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 7.072l.707-.707a1 1 0 10-1.414-1.414l-.707.707a1 1 0 001.414 1.414zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+        </button>
+    </div>
+
+    <div id="loginModal" class="min-h-screen flex items-center justify-center">
+        <div class="login-card rounded-xl p-10 max-w-lg w-full mx-4 shadow-2xl">
+            <img src="https://placehold.co/192x48/181A20/FFFFFF?text=EUROBOND" alt="EUROBOND Logo" class="mx-auto mb-8 w-48">
+            <h2 class="text-3xl font-bold text-center mb-6">Warehouse Inventory Login</h2>
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium" style="color: var(--secondary-text-color);">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required class="mt-1 block w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="border-color: var(--border-color); background-color: var(--input-bg-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium" style="color: var(--secondary-text-color);">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required class="mt-1 block w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="border-color: var(--border-color); background-color: var(--input-bg-color); color: var(--text-color);">
+                </div>
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold btn-primary">
+                    Sign In
+                </button>
+            </form>
+            <div id="loginError" class="mt-4 text-center text-sm text-red-500 hidden">Invalid username or password</div>
+        </div>
+    </div>
+
+    <script>
+        // Dark Mode Toggle Logic
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+
+        // Login Form Logic
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginError = document.getElementById('loginError');
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/dashboard';
+                } else {
+                    const errorData = await response.json();
+                    loginError.textContent = errorData.message || 'Invalid credentials';
+                    loginError.classList.remove('hidden');
+                }
+            } catch (error) {
+                loginError.textContent = 'An error occurred. Please try again.';
+                loginError.classList.remove('hidden');
+                console.error('Login Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

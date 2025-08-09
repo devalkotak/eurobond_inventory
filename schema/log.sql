@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS audit_log;
+
+CREATE TABLE audit_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER NOT NULL,
+  username TEXT NOT NULL,
+  action TEXT NOT NULL,
+  details TEXT
+);

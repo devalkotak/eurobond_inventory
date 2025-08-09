@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EUROBOND Inventory Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        html.dark {
+            --bg-color: #181A20; --header-bg: #23262F; --card-bg: #23262F; --text-color: #FFFFFF;
+            --secondary-text: #A3A8B8; --border-color: #2D303A; --table-header-bg: #2D303A;
+        }
+        html {
+            --bg-color: #F3F4F6; --header-bg: #FFFFFF; --card-bg: #FFFFFF; --text-color: #1F2937;
+            --secondary-text: #6B7280; --border-color: #D1D5DB; --table-header-bg: #F9FAFB;
+        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color); }
+        .dashboard-card, .header, .table-container, .modal-content, .reset-section { background-color: var(--card-bg); border-color: var(--border-color); }
+        .table-header { background-color: var(--table-header-bg); }
+        .secondary-text { color: var(--secondary-text); }
+        .main-text { color: var(--text-color); }
+        .border-color { border-color: var(--border-color); }
+        .loader { border-top-color: #1E90FF; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn-primary { background-color: #1E90FF; color: #FFFFFF; }
+        .btn-primary:hover { background-color: #1A7DD5; }
+        .status-in-stock, .status-active { background-color: rgba(34, 197, 94, 0.1); color: #22C55E; }
+        .status-out-of-stock, .status-suspended { background-color: rgba(239, 68, 68, 0.1); color: #EF4444; }
+    </style>
+</head>
+<body>
+
+    <div id="dashboard" class="min-h-screen flex flex-col">
+        <header class="header shadow-sm sticky top-0 z-40 border-b">
+            <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://placehold.co/160x40/23262F/FFFFFF?text=EUROBOND" alt="EUROBOND Logo" class="w-40 mr-4">
+                    <h1 class="text-2xl font-bold main-text hidden md:block">Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="secondary-text text-sm hidden sm:block">Role: <span class="font-semibold">{{ user_role }}</span></span>
+                    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 7.072l.707-.707a1 1 0 10-1.414-1.414l-.707.707a1 1 0 001.414 1.414zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <button id="logoutBtn" class="text-sm font-medium secondary-text hover:text-red-500 transition-colors duration-200 py-2 px-4 rounded-md border border-color hover:bg-gray-100 dark:hover:bg-gray-700">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 w-full">
+            <!-- Tabs -->
+            <div class="mb-8">
+                <div class="border-b border-color">
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <button id="inventory-tab" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600 dark:text-blue-400">Inventory</button>
+                        {% if user_role in ['admin', 'director'] %}
+                        <button id="reset-tab" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent secondary-text hover:border-gray-300 dark:hover:border-gray-600">Reset Inventory</button>
+                        {% endif %}
+                        {% if user_role == 'director' %}
+                        <button id="users-tab" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent secondary-text hover:border-gray-300 dark:hover:border-gray-600">User Management</button>
+                        <button id="log-tab" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent secondary-text hover:border-gray-300 dark:hover:border-gray-600">Audit Log</button>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Inventory Page Content -->
+            <div id="inventory-page" class="tab-content">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold main-text mb-4">Inventory Overview</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="dashboard-card rounded-xl p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-slate-700 text-cyan-400 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                </div>
+                                <div>
+                                    <h3 class="secondary-text text-sm font-medium">Total Unique Products</h3>
+                                    <p id="totalProducts" class="text-3xl font-bold main-text">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card rounded-xl p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-slate-700 text-green-400 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+                                </div>
+                                <div>
+                                    <h3 class="secondary-text text-sm font-medium">Total Stock Quantity</h3>
+                                    <p id="totalStock" class="text-3xl font-bold main-text">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card rounded-xl p-6">
+                            <div class="flex items-center">
+                                 <div class="p-3 rounded-full bg-slate-700 text-red-400 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                                </div>
+                                <div>
+                                    <h3 class="secondary-text text-sm font-medium">Out of Stock Products</h3>
+                                    <p id="outOfStock" class="text-3xl font-bold main-text">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                        <h2 class="text-2xl font-semibold main-text">Manage Inventory</h2>
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <div class="relative w-full md:w-auto">
+                                <input type="text" id="searchInput" placeholder="Search..." class="pl-10 pr-4 py-2 border border-color rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" style="background-color: var(--input-bg-color);">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 secondary-text" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                </div>
+                            </div>
+                            <button id="addItemBtn" class="btn-primary px-4 py-2 rounded-md text-sm font-medium">Add New Product</button>
+                        </div>
+                    </div>
+                    
+                    <div id="itemModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                        <div class="modal-content rounded-xl p-8 max-w-lg w-full mx-4 shadow-xl">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 id="modalTitle" class="text-xl font-semibold main-text">Add New Product</h3>
+                                <button id="closeModal" class="secondary-text hover:text-white transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+                            <form id="itemForm" class="space-y-4">
+                                <input type="hidden" id="itemId">
+                                <div>
+                                    <label for="itemColorCode" class="block text-sm font-medium secondary-text">Color Code</label>
+                                    <input type="number" id="itemColorCode" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                </div>
+                                <div>
+                                    <label for="itemGrade" class="block text-sm font-medium secondary-text">Grade</label>
+                                    <input type="text" id="itemGrade" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                </div>
+                                <div>
+                                    <label for="itemQuantity" class="block text-sm font-medium secondary-text">Quantity</label>
+                                    <input type="number" id="itemQuantity" min="0" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                </div>
+                                <div class="flex justify-end space-x-3 mt-6">
+                                    <button type="button" id="cancelItem" class="px-4 py-2 border border-color rounded-md text-sm font-medium secondary-text hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Cancel</button>
+                                    <button type="submit" id="saveItemBtn" class="px-4 py-2 border border-transparent rounded-md text-sm font-medium btn-primary">Add Product</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container shadow rounded-xl overflow-hidden border border-color">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="table-header">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Sr No.</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Color Code</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Grade</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Status</th>
+                                    <th id="actionsHeader" scope="col" class="px-6 py-3 text-right text-xs font-semibold secondary-text uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="noItemsMessage" class="hidden mt-12 text-center">
+                     <div class="mx-auto w-24 h-24 secondary-text">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4m0-4.003L12 12m0 0l-8.384 4.192M12 12l8.384 4.192" /></svg>
+                    </div>
+                    <h3 class="text-xl font-medium main-text mt-4">No inventory items found</h3>
+                    <p class="mt-2 text-sm secondary-text">Add your first item to begin managing your inventory.</p>
+                    <button id="addFirstItemBtn" class="mt-6 btn-primary px-6 py-3 rounded-md text-sm font-medium">Add New Item</button>
+                </div>
+            </div>
+
+            <!-- Reset Inventory Page Content -->
+            {% if user_role in ['admin', 'director'] %}
+            <div id="reset-page" class="tab-content hidden">
+                <div id="resetSection" class="p-6 reset-section shadow rounded-xl border-l-4 border-red-500">
+                    <h3 class="text-lg font-semibold main-text mb-2">Reset Inventory</h3>
+                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. This action cannot be undone.</p>
+                    <form id="resetInventoryForm">
+                        <div class="flex items-center gap-4">
+                            <input type="file" id="inventoryFile" name="inventoryFile" accept=".csv" required class="block w-full text-sm secondary-text file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"/>
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Reset Inventory</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- User Management Page Content -->
+            {% if user_role == 'director' %}
+            <div id="users-page" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold main-text">User Accounts</h2>
+                    <button id="addUserBtn" class="btn-primary px-4 py-2 rounded-md text-sm font-medium">Add New User</button>
+                </div>
+                <div class="table-container shadow rounded-xl overflow-hidden border border-color">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Username</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-semibold secondary-text uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
+                <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                    <div class="modal-content rounded-xl p-8 max-w-lg w-full mx-4 shadow-xl">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 id="userModalTitle" class="text-xl font-semibold main-text">Add New User</h3>
+                            <button id="closeUserModal" class="secondary-text hover:text-white transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                        <form id="userForm" class="space-y-4">
+                            <input type="hidden" id="editUserId">
+                            <div>
+                                <label for="newUsername" class="block text-sm font-medium secondary-text">Username</label>
+                                <input type="text" id="newUsername" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                            </div>
+                            <div>
+                                <label for="newPassword" class="block text-sm font-medium secondary-text">Password (leave blank to keep unchanged)</label>
+                                <input type="password" id="newPassword" class="mt-1 block w-full px-3 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                            </div>
+                            <div>
+                                <label for="newRole" class="block text-sm font-medium secondary-text">Role</label>
+                                <select id="newRole" class="mt-1 block w-full px-3 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                                    <option value="director">Director</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="viewer">Viewer</option>
+                                </select>
+                            </div>
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button type="button" id="cancelUser" class="px-4 py-2 border border-color rounded-md text-sm font-medium secondary-text hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+                                <button type="submit" id="saveUserBtn" class="px-4 py-2 btn-primary rounded-md text-sm font-medium">Create User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Audit Log Page Content -->
+            {% if user_role == 'director' %}
+            <div id="log-page" class="tab-content hidden">
+                <h2 class="text-2xl font-semibold main-text mb-4">Audit Log</h2>
+                <div class="table-container shadow rounded-xl overflow-hidden border border-color">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Timestamp</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Action</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-table-body" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <div id="loadingIndicator" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+        <div class="flex flex-col items-center">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-4"></div>
+            <p class="text-white text-lg font-medium">Loading...</p>
+        </div>
+    </div>
+
+    <script>
+        const USER_ROLE = "{{ user_role }}";
+        const CURRENT_USER_ID = parseInt("{{ user_id }}", 10);
+        const isDirector = USER_ROLE === 'director';
+        const isAdminOrDirector = ['admin', 'director'].includes(USER_ROLE);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Global Scope Functions ---
+            const showLoading = () => document.getElementById('loadingIndicator').classList.remove('hidden');
+            const hideLoading = () => document.getElementById('loadingIndicator').classList.add('hidden');
+
+            const showToast = (message, isError = false) => {
+                const toast = document.createElement('div');
+                const bgColor = isError ? 'bg-red-600' : 'bg-green-600';
+                toast.className = `fixed top-6 right-6 z-50 ${bgColor} text-white px-4 py-2 rounded-md shadow-lg opacity-0 transition-all duration-300 transform translate-x-full`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.remove('opacity-0', 'translate-x-full');
+                }, 10);
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-x-full');
+                    setTimeout(() => document.body.removeChild(toast), 300);
+                }, 3000);
+            };
+
+            // --- Data Fetching Functions ---
+            const fetchInventory = async () => {
+                showLoading();
+                try {
+                    const response = await fetch('/api/inventory');
+                    if (!response.ok) throw new Error('Failed to fetch inventory');
+                    localInventory = await response.json();
+                    renderInventoryTable();
+                    updateDashboard();
+                } catch (error) {
+                    console.error('Fetch Error:', error);
+                    showToast('Error loading inventory.', true);
+                } finally {
+                    hideLoading();
+                }
+            };
+
+            const fetchUsers = async () => {
+                if (!isDirector) return;
+                const response = await fetch('/api/users');
+                const users = await response.json();
+                const usersTableBody = document.getElementById('users-table-body');
+                usersTableBody.innerHTML = '';
+                users.forEach(user => {
+                    const isCurrentUser = user.id === CURRENT_USER_ID;
+                    const row = document.createElement('tr');
+                    const actionButtons = isCurrentUser
+                        ? `<span class="text-sm secondary-text pr-6"> (Current User)</span>`
+                        : `<button data-action="edit-user" data-id="${user.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
+                           <button data-action="toggle-status" data-id="${user.id}" data-status="${user.status}" class="text-yellow-400 hover:text-yellow-300">
+                               ${user.status === 'active' ? 'Suspend' : 'Activate'}
+                           </button>
+                           <button data-action="delete-user" data-id="${user.id}" class="text-red-400 hover:text-red-300">Delete</button>`;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${user.username}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${user.role}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'status-active' : 'status-suspended'}">
+                                ${user.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                            ${actionButtons}
+                        </td>
+                    `;
+                    usersTableBody.appendChild(row);
+                });
+            };
+
+            const fetchLogs = async () => {
+                if (!isDirector) return;
+                const response = await fetch('/api/logs');
+                const logs = await response.json();
+                const logTableBody = document.getElementById('log-table-body');
+                logTableBody.innerHTML = '';
+                logs.forEach(log => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${new Date(log.timestamp).toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${log.username}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${log.action.replace(/_/g, ' ')}</td>
+                        <td class="px-6 py-4 text-sm secondary-text">${log.details}</td>
+                    `;
+                    logTableBody.appendChild(row);
+                });
+            };
+
+            // --- Tab Management ---
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
+                        t.classList.add('border-transparent', 'secondary-text');
+                    });
+                    tab.classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
+                    tab.classList.remove('border-transparent', 'secondary-text');
+                    
+                    const targetPageId = tab.id.replace('-tab', '-page');
+                    tabContents.forEach(content => {
+                        content.classList.toggle('hidden', content.id !== targetPageId);
+                    });
+
+                    if (targetPageId === 'users-page' && isDirector) fetchUsers();
+                    if (targetPageId === 'log-page' && isDirector) fetchLogs();
+                });
+            });
+
+            // --- Theme Management ---
+            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', function() {
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                } else {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                }
+            });
+
+            // --- DOM Elements ---
+            const inventoryTableBody = document.getElementById('inventory-table-body');
+            const inventoryTableContainer = document.querySelector('#inventory-page .table-container');
+            const noItemsMessage = document.getElementById('noItemsMessage');
+            const addFirstItemBtn = document.getElementById('addFirstItemBtn');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const itemModal = document.getElementById('itemModal');
+            const closeModal = document.getElementById('closeModal');
+            const cancelItem = document.getElementById('cancelItem');
+            const itemForm = document.getElementById('itemForm');
+            const searchInput = document.getElementById('searchInput');
+            const totalProductsElement = document.getElementById('totalProducts');
+            const totalStockElement = document.getElementById('totalStock');
+            const outOfStockElement = document.getElementById('outOfStock');
+            const modalTitle = document.getElementById('modalTitle');
+            const saveItemBtn = document.getElementById('saveItemBtn');
+            const actionsHeader = document.getElementById('actionsHeader');
+            const resetInventoryForm = document.getElementById('resetInventoryForm');
+            const inventoryFile = document.getElementById('inventoryFile');
+            const logoutBtn = document.getElementById('logoutBtn');
+            let localInventory = [];
+
+            const renderInventoryTable = (searchTerm = '') => {
+                const lowerCaseSearchTerm = searchTerm.toLowerCase();
+                const filteredItems = localInventory.filter(item =>
+                    item.grade.toLowerCase().includes(lowerCaseSearchTerm) ||
+                    String(item.color_code).includes(lowerCaseSearchTerm)
+                );
+                inventoryTableBody.innerHTML = '';
+                if (localInventory.length === 0) {
+                    inventoryTableContainer.classList.add('hidden');
+                    noItemsMessage.classList.remove('hidden');
+                } else {
+                    inventoryTableContainer.classList.remove('hidden');
+                    noItemsMessage.classList.add('hidden');
+                }
+                if (filteredItems.length === 0 && localInventory.length > 0) {
+                     inventoryTableBody.innerHTML = `<tr><td colspan="${isAdminOrDirector ? 6 : 5}" class="px-6 py-4 text-center text-sm secondary-text">No products match your search.</td></tr>`;
+                }
+                filteredItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    const statusClass = item.quantity === 0 ? 'status-out-of-stock' : 'status-in-stock';
+                    const statusText = item.quantity === 0 ? 'Out of Stock' : 'In Stock';
+                    const actionsCell = isAdminOrDirector 
+                        ? `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                <button data-action="edit" data-id="${item.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
+                                <button data-action="delete" data-id="${item.id}" class="text-red-400 hover:text-red-300">Delete</button>
+                           </td>`
+                        : '<td class="px-6 py-4"></td>';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item.sr_no}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.color_code}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.grade}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.quantity}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                        </td>
+                        ${actionsCell}
+                    `;
+                    inventoryTableBody.appendChild(row);
+                });
+            };
+
+            const updateDashboard = () => {
+                totalProductsElement.textContent = localInventory.length;
+                totalStockElement.textContent = localInventory.reduce((sum, item) => sum + item.quantity, 0);
+                outOfStockElement.textContent = localInventory.filter(item => item.quantity === 0).length;
+            };
+
+            const openModalForEdit = (itemId) => {
+                const item = localInventory.find(i => i.id === itemId);
+                if (item) {
+                    modalTitle.textContent = 'Edit Product';
+                    saveItemBtn.textContent = 'Save Changes';
+                    document.getElementById('itemId').value = item.id;
+                    document.getElementById('itemColorCode').value = item.color_code;
+                    document.getElementById('itemGrade').value = item.grade;
+                    document.getElementById('itemQuantity').value = item.quantity;
+                    itemModal.classList.remove('hidden');
+                }
+            };
+
+            const openModalForAdd = () => {
+                modalTitle.textContent = 'Add New Product';
+                saveItemBtn.textContent = 'Add Product';
+                itemForm.reset();
+                document.getElementById('itemId').value = '';
+                itemModal.classList.remove('hidden');
+            };
+
+            const closeModalFunc = () => itemModal.classList.add('hidden');
+
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = '/';
+            });
+
+            searchInput.addEventListener('input', () => renderInventoryTable(searchInput.value));
+            
+            if(isAdminOrDirector){
+                addItemBtn.addEventListener('click', openModalForAdd);
+                addFirstItemBtn.addEventListener('click', openModalForAdd);
+                closeModal.addEventListener('click', closeModalFunc);
+                cancelItem.addEventListener('click', closeModalFunc);
+
+                itemForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const itemId = document.getElementById('itemId').value;
+                    const isEdit = !!itemId;
+                    const itemData = {
+                        color_code: document.getElementById('itemColorCode').value,
+                        grade: document.getElementById('itemGrade').value,
+                        quantity: document.getElementById('itemQuantity').value,
+                    };
+                    const url = isEdit ? `/api/inventory/${itemId}` : '/api/inventory';
+                    const method = isEdit ? 'PUT' : 'POST';
+                    try {
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(itemData)
+                        });
+                        if (!response.ok) {
+                            const err = await response.json();
+                            throw new Error(err.error || `Failed to ${isEdit ? 'update' : 'add'} item`);
+                        }
+                        closeModalFunc();
+                        showToast(`Product ${isEdit ? 'updated' : 'added'} successfully!`);
+                        fetchInventory();
+                    } catch (error) {
+                        console.error('Form Submit Error:', error);
+                        showToast(`Error: ${error.message}`, true);
+                    }
+                });
+
+                inventoryTableBody.addEventListener('click', async (e) => {
+                    const action = e.target.dataset.action;
+                    if(!action) return;
+                    const itemId = parseInt(e.target.dataset.id);
+                    if (action === 'edit') {
+                        openModalForEdit(itemId);
+                    }
+                    if (action === 'delete') {
+                        if (confirm('Are you sure you want to delete this product?')) {
+                            try {
+                                const response = await fetch(`/api/inventory/${itemId}`, { method: 'DELETE' });
+                                if (!response.ok) throw new Error('Failed to delete');
+                                showToast('Product deleted successfully!');
+                                fetchInventory();
+                            } catch(error) {
+                                console.error('Delete Error:', error);
+                                showToast('Error deleting product.', true);
+                            }
+                        }
+                    }
+                });
+
+                if (resetInventoryForm) {
+                    resetInventoryForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const file = inventoryFile.files[0];
+                        if (!file) {
+                            showToast('Please select a file to upload.', true);
+                            return;
+                        }
+                        if (!confirm('Are you absolutely sure? This will delete all current inventory.')) {
+                            return;
+                        }
+                        showLoading();
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        try {
+                            const response = await fetch('/api/inventory/reset', {
+                                method: 'POST',
+                                body: formData,
+                            });
+                            const result = await response.json();
+                            if (!response.ok) {
+                                throw new Error(result.error || 'An unknown error occurred.');
+                            }
+                            showToast(result.message || 'Inventory reset successfully!');
+                            fetchInventory();
+                        } catch (error) {
+                            console.error('Reset Error:', error);
+                            showToast(`Error resetting inventory: ${error.message}`, true);
+                        } finally {
+                            hideLoading();
+                            resetInventoryForm.reset();
+                        }
+                    });
+                }
+            }
+
+            if (isDirector) {
+                const usersTableBody = document.getElementById('users-table-body');
+                const addUserBtn = document.getElementById('addUserBtn');
+                const userModal = document.getElementById('userModal');
+                const closeUserModal = document.getElementById('closeUserModal');
+                const cancelUser = document.getElementById('cancelUser');
+                const userForm = document.getElementById('userForm');
+                const userModalTitle = document.getElementById('userModalTitle');
+                const saveUserBtn = document.getElementById('saveUserBtn');
+                const newPasswordInput = document.getElementById('newPassword');
+                const editUserIdInput = document.getElementById('editUserId');
+
+                const openUserModalForAdd = () => {
+                    userForm.reset();
+                    editUserIdInput.value = '';
+                    userModalTitle.textContent = 'Add New User';
+                    saveUserBtn.textContent = 'Create User';
+                    newPasswordInput.setAttribute('required', 'true');
+                    userModal.classList.remove('hidden');
+                };
+
+                const openUserModalForEdit = async (userId) => {
+                    const response = await fetch('/api/users');
+                    const users = await response.json();
+                    const user = users.find(u => u.id === userId);
+                    if(user) {
+                        userForm.reset();
+                        editUserIdInput.value = user.id;
+                        document.getElementById('newUsername').value = user.username;
+                        document.getElementById('newRole').value = user.role;
+                        userModalTitle.textContent = 'Edit User';
+                        saveUserBtn.textContent = 'Save Changes';
+                        newPasswordInput.removeAttribute('required');
+                        userModal.classList.remove('hidden');
+                    }
+                };
+
+                addUserBtn.addEventListener('click', openUserModalForAdd);
+                closeUserModal.addEventListener('click', () => userModal.classList.add('hidden'));
+                cancelUser.addEventListener('click', () => userModal.classList.add('hidden'));
+
+                userForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const userId = editUserIdInput.value;
+                    const isEdit = !!userId;
+                    const userData = {
+                        username: document.getElementById('newUsername').value,
+                        password: document.getElementById('newPassword').value,
+                        role: document.getElementById('newRole').value,
+                    };
+                    if (isEdit && !userData.password) {
+                        delete userData.password;
+                    }
+                    const url = isEdit ? `/api/users/${userId}` : '/api/users';
+                    const method = isEdit ? 'PUT' : 'POST';
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(userData)
+                    });
+                    if (response.ok) {
+                        userModal.classList.add('hidden');
+                        showToast(`User ${isEdit ? 'updated' : 'created'} successfully!`);
+                        fetchUsers();
+                    } else {
+                        const error = await response.json();
+                        showToast(`Error: ${error.error}`, true);
+                    }
+                });
+
+                usersTableBody.addEventListener('click', async (e) => {
+                    const action = e.target.dataset.action;
+                    if (!action) return;
+                    const userId = parseInt(e.target.dataset.id, 10);
+                    if (userId === CURRENT_USER_ID) return;
+
+                    if (action === 'edit-user') {
+                        openUserModalForEdit(userId);
+                    }
+
+                    if (action === 'toggle-status') {
+                        const currentStatus = e.target.dataset.status;
+                        const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+                        await fetch(`/api/users/${userId}/status`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: newStatus })
+                        });
+                        showToast(`User status updated to ${newStatus}.`);
+                        fetchUsers();
+                    }
+
+                    if (action === 'delete-user') {
+                        if (confirm('Are you sure you want to delete this user? This cannot be undone.')) {
+                            await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+                            showToast('User deleted successfully.');
+                            fetchUsers();
+                        }
+                    }
+                });
+            }
+            
+            // --- Initial Load ---
+            const setupUIForRole = () => {
+                if (!isAdminOrDirector) {
+                    if(addItemBtn) addItemBtn.style.display = 'none';
+                    if(addFirstItemBtn) addFirstItemBtn.style.display = 'none';
+                    if(actionsHeader) actionsHeader.style.display = 'none';
+                }
+            };
+            
+            setupUIForRole();
+            fetchInventory();
+            if (isDirector) {
+                fetchUsers();
+                fetchLogs();
+            }
+        });
+    </script>
+</body>
+</html>
