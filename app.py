@@ -17,10 +17,9 @@ app.config.update(
 )
 
 # Define the data directory for Fly.io's persistent disk
-DATA_DIR = '/data'
-INVENTORY_DB = os.path.join(DATA_DIR, 'inventory.db')
-USERS_DB = os.path.join(DATA_DIR, 'users.db')
-LOG_DB = os.path.join(DATA_DIR, 'log.db')
+INVENTORY_DB = 'inventory.db'
+USERS_DB = 'users.db'
+LOG_DB = 'log.db'
 
 # --- Database Helper Functions ---
 def get_db(db_name):
@@ -320,11 +319,10 @@ def get_logs():
     return jsonify([dict(log) for log in logs])
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
     if not os.path.exists(INVENTORY_DB):
         init_db(INVENTORY_DB, r'schema/schema_inventory.sql')
     if not os.path.exists(USERS_DB):
         init_db(USERS_DB, r'schema/schema_users.sql')
     if not os.path.exists(LOG_DB):
         init_db(LOG_DB, r'schema/schema_log.sql')
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=True)
