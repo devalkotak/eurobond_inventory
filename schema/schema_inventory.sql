@@ -2,14 +2,18 @@ DROP TABLE IF EXISTS inventory;
 
 CREATE TABLE inventory (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  color_code INTEGER NOT NULL,
+  item TEXT NOT NULL,
+  colore TEXT NOT NULL,
   grade TEXT NOT NULL,
-  quantity INTEGER NOT NULL
+  batch_no TEXT NOT NULL,
+  sqm REAL NOT NULL
 );
 
--- Sample data (sr_no is no longer needed here)
-INSERT INTO inventory (color_code, grade, quantity) VALUES
-(401, 'A', 150),
-(402, 'B', 25),
-(550, 'A', 0),
-(610, 'C', 88);
+-- Sample data matching the new structure
+INSERT INTO inventory (item, colore, grade, batch_no, sqm) VALUES
+('AR-1101', 'Bright Silver', 'BS', 'LJ-2422', 2852),
+('AR-1101', 'Bright Silver', 'BS', 'LJ-2423', 2612),
+('AR-1102', 'Silver', 'GL', 'ETA203A', 206),
+('AR-1102', 'Silver', 'GL', 'ETA203B', 198),
+('AR-1103', 'Dark Silver', 'DS', 'LJ-2424', 1500),
+('AR-1104', 'Light Silver', 'LS', 'LJ-2425', 1200);

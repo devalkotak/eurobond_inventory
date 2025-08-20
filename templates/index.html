@@ -88,7 +88,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
                                 </div>
                                 <div>
-                                    <h3 class="secondary-text text-sm font-medium">Total Stock Quantity</h3>
+                                    <h3 class="secondary-text text-sm font-medium">Total Stock (SQM)</h3>
                                     <p id="totalStock" class="text-3xl font-bold main-text">0</p>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                         <h2 class="text-2xl font-semibold main-text">Manage Inventory</h2>
                         <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                             <div class="relative w-full md:w-auto">
-                                <input type="text" id="searchInput" placeholder="Search..." class="pl-10 pr-4 py-2 border border-color rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" style="background-color: var(--input-bg-color);">
+                                <input type="text" id="searchInput" placeholder="Search Item, Grade, Batch..." class="pl-10 pr-4 py-2 border border-color rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" style="background-color: var(--input-bg-color);">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 secondary-text" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                 </div>
@@ -132,16 +132,24 @@
                             <form id="itemForm" class="space-y-4">
                                 <input type="hidden" id="itemId">
                                 <div>
-                                    <label for="itemColorCode" class="block text-sm font-medium secondary-text">Color Code</label>
-                                    <input type="number" id="itemColorCode" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                    <label for="itemItem" class="block text-sm font-medium secondary-text">Item</label>
+                                    <input type="text" id="itemItem" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                </div>
+                                <div>
+                                    <label for="itemColore" class="block text-sm font-medium secondary-text">Colore</label>
+                                    <input type="text" id="itemColore" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
                                     <label for="itemGrade" class="block text-sm font-medium secondary-text">Grade</label>
                                     <input type="text" id="itemGrade" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
-                                    <label for="itemQuantity" class="block text-sm font-medium secondary-text">Quantity</label>
-                                    <input type="number" id="itemQuantity" min="0" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                    <label for="itemBatchNo" class="block text-sm font-medium secondary-text">Batch No</label>
+                                    <input type="text" id="itemBatchNo" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                </div>
+                                <div>
+                                    <label for="itemSqm" class="block text-sm font-medium secondary-text">SQM</label>
+                                    <input type="number" id="itemSqm" min="0" step="0.01" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div class="flex justify-end space-x-3 mt-6">
                                     <button type="button" id="cancelItem" class="px-4 py-2 border border-color rounded-md text-sm font-medium secondary-text hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Cancel</button>
@@ -158,9 +166,11 @@
                             <thead class="table-header">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Sr No.</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Color Code</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Item</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Colore</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Grade</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Batch No</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">SQM</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Status</th>
                                     <th id="actionsHeader" scope="col" class="px-6 py-3 text-right text-xs font-semibold secondary-text uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -185,7 +195,7 @@
             <div id="reset-page" class="tab-content hidden">
                 <div id="resetSection" class="p-6 reset-section shadow rounded-xl border-l-4 border-red-500">
                     <h3 class="text-lg font-semibold main-text mb-2">Reset Inventory</h3>
-                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. This action cannot be undone.</p>
+                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item, Colore, Grade, Batch No, SQM.</p>
                     <form id="resetInventoryForm">
                         <div class="flex items-center gap-4">
                             <input type="file" id="inventoryFile" name="inventoryFile" accept=".csv" required class="block w-full text-sm secondary-text file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"/>
@@ -308,13 +318,14 @@
             };
 
             // --- Data Fetching Functions ---
-            const fetchInventory = async () => {
+            const fetchInventory = async (searchTerm = '') => {
                 showLoading();
                 try {
-                    const response = await fetch('/api/inventory');
+                    const url = searchTerm ? `/api/inventory/search?q=${encodeURIComponent(searchTerm)}` : '/api/inventory';
+                    const response = await fetch(url);
                     if (!response.ok) throw new Error('Failed to fetch inventory');
                     localInventory = await response.json();
-                    renderInventoryTable();
+                    renderInventoryTable(localInventory);
                     updateDashboard();
                 } catch (error) {
                     console.error('Fetch Error:', error);
@@ -328,50 +339,14 @@
                 if (!isDirector) return;
                 const response = await fetch('/api/users');
                 const users = await response.json();
-                const usersTableBody = document.getElementById('users-table-body');
-                usersTableBody.innerHTML = '';
-                users.forEach(user => {
-                    const isCurrentUser = user.id === CURRENT_USER_ID;
-                    const row = document.createElement('tr');
-                    const actionButtons = isCurrentUser
-                        ? `<span class="text-sm secondary-text pr-6"> (Current User)</span>`
-                        : `<button data-action="edit-user" data-id="${user.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
-                           <button data-action="toggle-status" data-id="${user.id}" data-status="${user.status}" class="text-yellow-400 hover:text-yellow-300">
-                               ${user.status === 'active' ? 'Suspend' : 'Activate'}
-                           </button>
-                           <button data-action="delete-user" data-id="${user.id}" class="text-red-400 hover:text-red-300">Delete</button>`;
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${user.username}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${user.role}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'status-active' : 'status-suspended'}">
-                                ${user.status}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                            ${actionButtons}
-                        </td>
-                    `;
-                    usersTableBody.appendChild(row);
-                });
+                renderUsersTable(users);
             };
 
             const fetchLogs = async () => {
                 if (!isDirector) return;
                 const response = await fetch('/api/logs');
                 const logs = await response.json();
-                const logTableBody = document.getElementById('log-table-body');
-                logTableBody.innerHTML = '';
-                logs.forEach(log => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${new Date(log.timestamp).toLocaleString()}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${log.username}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${log.action.replace(/_/g, ' ')}</td>
-                        <td class="px-6 py-4 text-sm secondary-text">${log.details}</td>
-                    `;
-                    logTableBody.appendChild(row);
-                });
+                renderLogTable(logs);
             };
 
             // --- Tab Management ---
@@ -454,27 +429,21 @@
             const logoutBtn = document.getElementById('logoutBtn');
             let localInventory = [];
 
-            const renderInventoryTable = (searchTerm = '') => {
-                const lowerCaseSearchTerm = searchTerm.toLowerCase();
-                const filteredItems = localInventory.filter(item =>
-                    item.grade.toLowerCase().includes(lowerCaseSearchTerm) ||
-                    String(item.color_code).includes(lowerCaseSearchTerm)
-                );
+            const renderInventoryTable = (inventoryData) => {
                 inventoryTableBody.innerHTML = '';
-                if (localInventory.length === 0) {
+                if (!inventoryData || inventoryData.length === 0) {
                     inventoryTableContainer.classList.add('hidden');
                     noItemsMessage.classList.remove('hidden');
-                } else {
-                    inventoryTableContainer.classList.remove('hidden');
-                    noItemsMessage.classList.add('hidden');
+                    return;
                 }
-                if (filteredItems.length === 0 && localInventory.length > 0) {
-                     inventoryTableBody.innerHTML = `<tr><td colspan="${isAdminOrDirector ? 6 : 5}" class="px-6 py-4 text-center text-sm secondary-text">No products match your search.</td></tr>`;
-                }
-                filteredItems.forEach(item => {
+
+                inventoryTableContainer.classList.remove('hidden');
+                noItemsMessage.classList.add('hidden');
+
+                inventoryData.forEach(item => {
                     const row = document.createElement('tr');
-                    const statusClass = item.quantity === 0 ? 'status-out-of-stock' : 'status-in-stock';
-                    const statusText = item.quantity === 0 ? 'Out of Stock' : 'In Stock';
+                    const statusClass = item.sqm <= 0 ? 'status-out-of-stock' : 'status-in-stock';
+                    const statusText = item.sqm <= 0 ? 'Out of Stock' : 'In Stock';
                     const actionsCell = isAdminOrDirector 
                         ? `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                 <button data-action="edit" data-id="${item.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
@@ -483,9 +452,11 @@
                         : '<td class="px-6 py-4"></td>';
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item.sr_no}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.color_code}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.item}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.colore}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.grade}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.quantity}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.batch_no}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.sqm}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
                         </td>
@@ -497,8 +468,8 @@
 
             const updateDashboard = () => {
                 totalProductsElement.textContent = localInventory.length;
-                totalStockElement.textContent = localInventory.reduce((sum, item) => sum + item.quantity, 0);
-                outOfStockElement.textContent = localInventory.filter(item => item.quantity === 0).length;
+                totalStockElement.textContent = localInventory.reduce((sum, item) => sum + item.sqm, 0).toFixed(2);
+                outOfStockElement.textContent = localInventory.filter(item => item.sqm <= 0).length;
             };
 
             const openModalForEdit = (itemId) => {
@@ -507,9 +478,11 @@
                     modalTitle.textContent = 'Edit Product';
                     saveItemBtn.textContent = 'Save Changes';
                     document.getElementById('itemId').value = item.id;
-                    document.getElementById('itemColorCode').value = item.color_code;
+                    document.getElementById('itemItem').value = item.item;
+                    document.getElementById('itemColore').value = item.colore;
                     document.getElementById('itemGrade').value = item.grade;
-                    document.getElementById('itemQuantity').value = item.quantity;
+                    document.getElementById('itemBatchNo').value = item.batch_no;
+                    document.getElementById('itemSqm').value = item.sqm;
                     itemModal.classList.remove('hidden');
                 }
             };
@@ -530,7 +503,7 @@
                 window.location.href = '/';
             });
 
-            searchInput.addEventListener('input', () => renderInventoryTable(searchInput.value));
+            searchInput.addEventListener('input', () => fetchInventory(searchInput.value));
             
             if(isAdminOrDirector){
                 addItemBtn.addEventListener('click', openModalForAdd);
@@ -543,9 +516,11 @@
                     const itemId = document.getElementById('itemId').value;
                     const isEdit = !!itemId;
                     const itemData = {
-                        color_code: document.getElementById('itemColorCode').value,
+                        item: document.getElementById('itemItem').value,
+                        colore: document.getElementById('itemColore').value,
                         grade: document.getElementById('itemGrade').value,
-                        quantity: document.getElementById('itemQuantity').value,
+                        batch_no: document.getElementById('itemBatchNo').value,
+                        sqm: document.getElementById('itemSqm').value,
                     };
                     const url = isEdit ? `/api/inventory/${itemId}` : '/api/inventory';
                     const method = isEdit ? 'PUT' : 'POST';
@@ -637,6 +612,49 @@
                 const saveUserBtn = document.getElementById('saveUserBtn');
                 const newPasswordInput = document.getElementById('newPassword');
                 const editUserIdInput = document.getElementById('editUserId');
+                const logTableBody = document.getElementById('log-table-body');
+                
+                const renderUsersTable = (users) => {
+                    usersTableBody.innerHTML = '';
+                    users.forEach(user => {
+                        const isCurrentUser = user.id === CURRENT_USER_ID;
+                        const row = document.createElement('tr');
+                        const actionButtons = isCurrentUser
+                            ? `<span class="text-sm secondary-text pr-6"> (Current User)</span>`
+                            : `<button data-action="edit-user" data-id="${user.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
+                               <button data-action="toggle-status" data-id="${user.id}" data-status="${user.status}" class="text-yellow-400 hover:text-yellow-300">
+                                   ${user.status === 'active' ? 'Suspend' : 'Activate'}
+                               </button>
+                               <button data-action="delete-user" data-id="${user.id}" class="text-red-400 hover:text-red-300">Delete</button>`;
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${user.username}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${user.role}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'status-active' : 'status-suspended'}">
+                                    ${user.status}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                ${actionButtons}
+                            </td>
+                        `;
+                        usersTableBody.appendChild(row);
+                    });
+                };
+                
+                const renderLogTable = (logs) => {
+                    logTableBody.innerHTML = '';
+                    logs.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${new Date(log.timestamp).toLocaleString()}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${log.username}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${log.action.replace(/_/g, ' ')}</td>
+                            <td class="px-6 py-4 text-sm secondary-text">${log.details}</td>
+                        `;
+                        logTableBody.appendChild(row);
+                    });
+                };
 
                 const openUserModalForAdd = () => {
                     userForm.reset();

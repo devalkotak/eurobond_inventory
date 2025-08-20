@@ -7,7 +7,7 @@ import io
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'your_very_secret_key_final_v2' # Change this in a real application
+app.secret_key = 'your_very_secret_key_final_v3' # Change this in a real application
 
 # --- Session Cookie Configuration for Security ---
 app.config.update(
@@ -16,7 +16,6 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',
 )
 
-# Define the data directory for Fly.io's persistent disk
 INVENTORY_DB = 'inventory.db'
 USERS_DB = 'users.db'
 LOG_DB = 'log.db'
@@ -227,9 +226,8 @@ def get_inventory():
     if 'user_id' not in session:
         return jsonify({"error": "Unauthorized"}), 401
     db = get_db(INVENTORY_DB)
-    items_from_db = db.execute('SELECT id, color_code, grade, quantity FROM inventory ORDER BY id').fetchall()
+    items_from_db = db.execute('SELECT id, item, colore, grade, batch_no, sqm FROM inventory ORDER BY id').fetchall()
     
-    # Dynamically generate sequential sr_no
     sequenced_items = []
     for i, item in enumerate(items_from_db):
         item_dict = dict(item)
@@ -238,17 +236,51 @@ def get_inventory():
         
     return jsonify(sequenced_items)
 
+@app.route('/api/inventory/search', methods=['GET'])
+def search_inventory():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    search_term = request.args.get('q', '')
+    search_terms = search_term.split()
+    
+    db = get_db(INVENTORY_DB)
+    
+    base_query = 'SELECT id, item, colore, grade, batch_no, sqm FROM inventory'
+    conditions = []
+    params = []
+    
+    for term in search_terms:
+        conditions.append("(item LIKE ? OR colore LIKE ? OR grade LIKE ? OR batch_no LIKE ?)")
+        params.extend([f'%{term}%'] * 4)
+        
+    if conditions:
+        query = f"{base_query} WHERE {' AND '.join(conditions)} ORDER BY id"
+    else:
+        query = f"{base_query} ORDER BY id"
+
+    items_from_db = db.execute(query, tuple(params)).fetchall()
+    
+    sequenced_items = []
+    for i, item in enumerate(items_from_db):
+        item_dict = dict(item)
+        item_dict['sr_no'] = i + 1
+        sequenced_items.append(item_dict)
+        
+    return jsonify(sequenced_items)
+
+
 @app.route('/api/inventory', methods=['POST'])
 def add_inventory_item():
     if not is_admin_or_director():
         return jsonify({"error": "Forbidden"}), 403
     data = request.get_json()
     db = get_db(INVENTORY_DB)
-    cur = db.execute('INSERT INTO inventory (color_code, grade, quantity) VALUES (?, ?, ?)',
-                     [int(data['color_code']), data['grade'], int(data['quantity'])])
+    cur = db.execute('INSERT INTO inventory (item, colore, grade, batch_no, sqm) VALUES (?, ?, ?, ?, ?)',
+                     [data['item'], data['colore'], data['grade'], data['batch_no'], float(data['sqm'])])
     db.commit()
     new_id = cur.lastrowid
-    log_action("INVENTORY_ADD", f"Added new item (ID: {new_id}) with Color Code: {data['color_code']}, Grade: {data['grade']}, Quantity: {data['quantity']}.")
+    log_action("INVENTORY_ADD", f"Added new item (ID: {new_id}) with details: {data}.")
     new_item = db.execute('SELECT * FROM inventory WHERE id = ?', [new_id]).fetchone()
     return jsonify(dict(new_item)), 201
 
@@ -263,8 +295,8 @@ def update_inventory_item(item_id):
     if not old_item:
         return jsonify({"error": "Item not found"}), 404
 
-    db.execute('UPDATE inventory SET color_code = ?, grade = ?, quantity = ? WHERE id = ?',
-               [int(data['color_code']), data['grade'], int(data['quantity']), item_id])
+    db.execute('UPDATE inventory SET item = ?, colore = ?, grade = ?, batch_no = ?, sqm = ? WHERE id = ?',
+               [data['item'], data['colore'], data['grade'], data['batch_no'], float(data['sqm']), item_id])
     db.commit()
     log_action("INVENTORY_UPDATE", f"Updated item ID {item_id}. Old: {dict(old_item)}, New: {data}")
     updated_item = db.execute('SELECT * FROM inventory WHERE id = ?', [item_id]).fetchone()
@@ -299,9 +331,9 @@ def reset_inventory():
         csv_reader = csv.reader(stream)
         next(csv_reader, None) # Skip header
         
-        new_items = [(int(row[1]), row[2], int(row[3])) for row in csv_reader if len(row) == 4]
+        new_items = [(row[0], row[1], row[2], row[3], float(row[4])) for row in csv_reader if len(row) == 5]
         
-        db.executemany('INSERT INTO inventory (color_code, grade, quantity) VALUES (?, ?, ?)', new_items)
+        db.executemany('INSERT INTO inventory (item, colore, grade, batch_no, sqm) VALUES (?, ?, ?, ?, ?)', new_items)
         db.commit()
         log_action("INVENTORY_RESET", f"Reset inventory with {len(new_items)} items from file '{file.filename}'.")
         return jsonify({"success": True, "message": f"Inventory reset with {len(new_items)} items."})
