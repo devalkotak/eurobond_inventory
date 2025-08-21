@@ -7,7 +7,7 @@ import io
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'your_very_secret_key_final_v3' # Change this in a real application
+app.secret_key = 'your_very_secret_key_final_v2' # Change this in a real application
 
 # --- Session Cookie Configuration for Security ---
 app.config.update(
@@ -352,9 +352,9 @@ def get_logs():
 
 if __name__ == '__main__':
     if not os.path.exists(INVENTORY_DB):
-        init_db(INVENTORY_DB, r'schema/schema_inventory.sql')
+        init_db(INVENTORY_DB, 'schema/schema_inventory.sql')
     if not os.path.exists(USERS_DB):
-        init_db(USERS_DB, r'schema/schema_users.sql')
+        init_db(USERS_DB, 'schema/schema_users.sql')
     if not os.path.exists(LOG_DB):
-        init_db(LOG_DB, r'schema/schema_log.sql')
+        init_db(LOG_DB, 'schema/schema_log.sql')
     app.run(debug=True)

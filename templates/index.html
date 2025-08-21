@@ -68,7 +68,7 @@
 
             <!-- Inventory Page Content -->
             <div id="inventory-page" class="tab-content">
-                <!-- <div class="mb-8">
+                <div class="mb-8">
                     <h2 class="text-2xl font-semibold main-text mb-4">Inventory Overview</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="dashboard-card rounded-xl p-6">
@@ -105,7 +105,7 @@
                             </div>
                         </div>
                     </div>
-                </div> -->
+                </div>
 
                 <div class="mb-8">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
@@ -297,58 +297,140 @@
         const isDirector = USER_ROLE === 'director';
         const isAdminOrDirector = ['admin', 'director'].includes(USER_ROLE);
 
+        // --- Global Scope Functions ---
+        const showLoading = () => document.getElementById('loadingIndicator').classList.remove('hidden');
+        const hideLoading = () => document.getElementById('loadingIndicator').classList.add('hidden');
+
+        const showToast = (message, isError = false) => {
+            const toast = document.createElement('div');
+            const bgColor = isError ? 'bg-red-600' : 'bg-green-600';
+            toast.className = `fixed top-6 right-6 z-50 ${bgColor} text-white px-4 py-2 rounded-md shadow-lg opacity-0 transition-all duration-300 transform translate-x-full`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-x-full');
+            }, 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        };
+
+        // --- Data Fetching Functions ---
+        let localInventory = [];
+        const fetchInventory = async (searchTerm = '') => {
+            showLoading();
+            try {
+                const url = searchTerm ? `/api/inventory/search?q=${encodeURIComponent(searchTerm)}` : '/api/inventory';
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch inventory');
+                localInventory = await response.json();
+                renderInventoryTable(localInventory);
+                updateDashboard();
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                showToast('Error loading inventory.', true);
+            } finally {
+                hideLoading();
+            }
+        };
+
+        const fetchUsers = async () => {
+            if (!isDirector) return;
+            const response = await fetch('/api/users');
+            const users = await response.json();
+            renderUsersTable(users);
+        };
+
+        const fetchLogs = async () => {
+            if (!isDirector) return;
+            const response = await fetch('/api/logs');
+            const logs = await response.json();
+            renderLogTable(logs);
+        };
+
+        // --- Rendering Functions ---
+        const renderInventoryTable = (inventoryData) => {
+            const inventoryTableBody = document.getElementById('inventory-table-body');
+            inventoryTableBody.innerHTML = '';
+            if (!inventoryData || inventoryData.length === 0) {
+                document.querySelector('#inventory-page .table-container').classList.add('hidden');
+                document.getElementById('noItemsMessage').classList.remove('hidden');
+                return;
+            }
+            document.querySelector('#inventory-page .table-container').classList.remove('hidden');
+            document.getElementById('noItemsMessage').classList.add('hidden');
+            inventoryData.forEach(item => {
+                const row = document.createElement('tr');
+                const statusClass = item.sqm <= 0 ? 'status-out-of-stock' : 'status-in-stock';
+                const statusText = item.sqm <= 0 ? 'Out of Stock' : 'In Stock';
+                const actionsCell = isAdminOrDirector 
+                    ? `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                            <button data-action="edit" data-id="${item.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
+                            <button data-action="delete" data-id="${item.id}" class="text-red-400 hover:text-red-300">Delete</button>
+                       </td>`
+                    : '<td class="px-6 py-4"></td>';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item.sr_no}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.item}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.colore}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.grade}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.batch_no}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.sqm}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                    </td>
+                    ${actionsCell}
+                `;
+                inventoryTableBody.appendChild(row);
+            });
+        };
+
+        const renderUsersTable = (users) => {
+            const usersTableBody = document.getElementById('users-table-body');
+            usersTableBody.innerHTML = '';
+            users.forEach(user => {
+                const isCurrentUser = user.id === CURRENT_USER_ID;
+                const row = document.createElement('tr');
+                const actionButtons = isCurrentUser
+                    ? `<span class="text-sm secondary-text pr-6"> (Current User)</span>`
+                    : `<button data-action="edit-user" data-id="${user.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
+                       <button data-action="toggle-status" data-id="${user.id}" data-status="${user.status}" class="text-yellow-400 hover:text-yellow-300">
+                           ${user.status === 'active' ? 'Suspend' : 'Activate'}
+                       </button>
+                       <button data-action="delete-user" data-id="${user.id}" class="text-red-400 hover:text-red-300">Delete</button>`;
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${user.username}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${user.role}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'status-active' : 'status-suspended'}">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                        ${actionButtons}
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+        };
+
+        const renderLogTable = (logs) => {
+            const logTableBody = document.getElementById('log-table-body');
+            logTableBody.innerHTML = '';
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${new Date(log.timestamp).toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${log.username}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${log.action.replace(/_/g, ' ')}</td>
+                    <td class="px-6 py-4 text-sm secondary-text">${log.details}</td>
+                `;
+                logTableBody.appendChild(row);
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Global Scope Functions ---
-            const showLoading = () => document.getElementById('loadingIndicator').classList.remove('hidden');
-            const hideLoading = () => document.getElementById('loadingIndicator').classList.add('hidden');
-
-            const showToast = (message, isError = false) => {
-                const toast = document.createElement('div');
-                const bgColor = isError ? 'bg-red-600' : 'bg-green-600';
-                toast.className = `fixed top-6 right-6 z-50 ${bgColor} text-white px-4 py-2 rounded-md shadow-lg opacity-0 transition-all duration-300 transform translate-x-full`;
-                toast.textContent = message;
-                document.body.appendChild(toast);
-                setTimeout(() => {
-                    toast.classList.remove('opacity-0', 'translate-x-full');
-                }, 10);
-                setTimeout(() => {
-                    toast.classList.add('opacity-0', 'translate-x-full');
-                    setTimeout(() => document.body.removeChild(toast), 300);
-                }, 3000);
-            };
-
-            // --- Data Fetching Functions ---
-            const fetchInventory = async (searchTerm = '') => {
-                showLoading();
-                try {
-                    const url = searchTerm ? `/api/inventory/search?q=${encodeURIComponent(searchTerm)}` : '/api/inventory';
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Failed to fetch inventory');
-                    localInventory = await response.json();
-                    renderInventoryTable(localInventory);
-                    updateDashboard();
-                } catch (error) {
-                    console.error('Fetch Error:', error);
-                    showToast('Error loading inventory.', true);
-                } finally {
-                    hideLoading();
-                }
-            };
-
-            const fetchUsers = async () => {
-                if (!isDirector) return;
-                const response = await fetch('/api/users');
-                const users = await response.json();
-                renderUsersTable(users);
-            };
-
-            const fetchLogs = async () => {
-                if (!isDirector) return;
-                const response = await fetch('/api/logs');
-                const logs = await response.json();
-                renderLogTable(logs);
-            };
-
             // --- Tab Management ---
             const tabs = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
@@ -427,44 +509,6 @@
             const resetInventoryForm = document.getElementById('resetInventoryForm');
             const inventoryFile = document.getElementById('inventoryFile');
             const logoutBtn = document.getElementById('logoutBtn');
-            let localInventory = [];
-
-            const renderInventoryTable = (inventoryData) => {
-                inventoryTableBody.innerHTML = '';
-                if (!inventoryData || inventoryData.length === 0) {
-                    inventoryTableContainer.classList.add('hidden');
-                    noItemsMessage.classList.remove('hidden');
-                    return;
-                }
-
-                inventoryTableContainer.classList.remove('hidden');
-                noItemsMessage.classList.add('hidden');
-
-                inventoryData.forEach(item => {
-                    const row = document.createElement('tr');
-                    const statusClass = item.sqm <= 0 ? 'status-out-of-stock' : 'status-in-stock';
-                    const statusText = item.sqm <= 0 ? 'Out of Stock' : 'In Stock';
-                    const actionsCell = isAdminOrDirector 
-                        ? `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                                <button data-action="edit" data-id="${item.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
-                                <button data-action="delete" data-id="${item.id}" class="text-red-400 hover:text-red-300">Delete</button>
-                           </td>`
-                        : '<td class="px-6 py-4"></td>';
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item.sr_no}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.item}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.colore}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.grade}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.batch_no}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.sqm}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
-                        </td>
-                        ${actionsCell}
-                    `;
-                    inventoryTableBody.appendChild(row);
-                });
-            };
 
             const updateDashboard = () => {
                 totalProductsElement.textContent = localInventory.length;
@@ -612,50 +656,7 @@
                 const saveUserBtn = document.getElementById('saveUserBtn');
                 const newPasswordInput = document.getElementById('newPassword');
                 const editUserIdInput = document.getElementById('editUserId');
-                const logTableBody = document.getElementById('log-table-body');
-
-                const renderUsersTable = (users) => {
-                    usersTableBody.innerHTML = '';
-                    users.forEach(user => {
-                        const isCurrentUser = user.id === CURRENT_USER_ID;
-                        const row = document.createElement('tr');
-                        const actionButtons = isCurrentUser
-                            ? `<span class="text-sm secondary-text pr-6"> (Current User)</span>`
-                            : `<button data-action="edit-user" data-id="${user.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
-                               <button data-action="toggle-status" data-id="${user.id}" data-status="${user.status}" class="text-yellow-400 hover:text-yellow-300">
-                                   ${user.status === 'active' ? 'Suspend' : 'Activate'}
-                               </button>
-                               <button data-action="delete-user" data-id="${user.id}" class="text-red-400 hover:text-red-300">Delete</button>`;
-                        row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${user.username}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${user.role}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'status-active' : 'status-suspended'}">
-                                    ${user.status}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                                ${actionButtons}
-                            </td>
-                        `;
-                        usersTableBody.appendChild(row);
-                    });
-                };
-
-                const renderLogTable = (logs) => {
-                    logTableBody.innerHTML = '';
-                    logs.forEach(log => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${new Date(log.timestamp).toLocaleString()}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${log.username}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${log.action.replace(/_/g, ' ')}</td>
-                            <td class="px-6 py-4 text-sm secondary-text">${log.details}</td>
-                        `;
-                        logTableBody.appendChild(row);
-                    });
-                };
-
+                
                 const openUserModalForAdd = () => {
                     userForm.reset();
                     editUserIdInput.value = '';
