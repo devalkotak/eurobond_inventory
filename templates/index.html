@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ url_for('static', filename='media/favicon.png') }}">
     <title>EUROBOND Inventory Management</title>
+    <link rel="icon" href="{{ url_for('static', filename='media/favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
@@ -37,8 +37,6 @@
             <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <div class="flex items-center">
                     <img id="header-logo" src="" alt="EUROBOND Logo" class="w-40 mr-4">
-                    <!-- <img src="{{ url_for('static', filename='media/lightmode.png') }}" alt="EUROBOND Logo LIGHT" class="w-40 mr-4 block dark:hidden">
-                    <img src="{{ url_for('static', filename='media/darkmode.png') }}" alt="EUROBOND Logo DARK" class="w-40 mr-4 hidden dark:block"> -->
                     <h1 class="text-2xl font-bold main-text hidden md:block">Dashboard</h1>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -71,7 +69,7 @@
 
             <!-- Inventory Page Content -->
             <div id="inventory-page" class="tab-content">
-                <!-- <div class="mb-8">
+                <div class="mb-8">
                     <h2 class="text-2xl font-semibold main-text mb-4">Inventory Overview</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="dashboard-card rounded-xl p-6">
@@ -108,22 +106,24 @@
                             </div>
                         </div>
                     </div>
-                </div> -->
+                </div>
 
                 <div class="mb-8">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                         <h2 class="text-2xl font-semibold main-text">Manage Inventory</h2>
-                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                            <div class="relative w-full md:w-auto">
-                                <input type="text" id="searchInput" placeholder="Search Item, Grade, Batch..." class="pl-10 pr-4 py-2 border border-color rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" style="background-color: var(--input-bg-color);">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 secondary-text" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                                </div>
-                            </div>
+                         <div class="flex items-center gap-2">
                             <button id="addItemBtn" class="btn-primary px-4 py-2 rounded-md text-sm font-medium">Add New Product</button>
+                            <button id="clearSearchBtn" class="text-sm font-medium secondary-text hover:text-white transition-colors duration-200 py-2 px-4 rounded-md border border-color hover:bg-gray-100 dark:hover:bg-gray-700">Clear Search</button>
                         </div>
                     </div>
                     
+                    <div id="search-container" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <input type="text" id="search-item" placeholder="Search Item..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                        <input type="text" id="search-color" placeholder="Search Color..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                        <input type="text" id="search-grade" placeholder="Search Grade..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                        <input type="text" id="search-batch_no" placeholder="Search Batch No..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                    </div>
+
                     <div id="itemModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
                         <div class="modal-content rounded-xl p-8 max-w-lg w-full mx-4 shadow-xl">
                             <div class="flex justify-between items-center mb-6">
@@ -139,8 +139,8 @@
                                     <input type="text" id="itemItem" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
-                                    <label for="itemColore" class="block text-sm font-medium secondary-text">Colore</label>
-                                    <input type="text" id="itemColore" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                    <label for="itemColor" class="block text-sm font-medium secondary-text">Color</label>
+                                    <input type="text" id="itemColor" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
                                     <label for="itemGrade" class="block text-sm font-medium secondary-text">Grade</label>
@@ -170,7 +170,7 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Sr No.</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Item</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Colore</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Color</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Grade</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Batch No</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">SQM</th>
@@ -198,7 +198,7 @@
             <div id="reset-page" class="tab-content hidden">
                 <div id="resetSection" class="p-6 reset-section shadow rounded-xl border-l-4 border-red-500">
                     <h3 class="text-lg font-semibold main-text mb-2">Reset Inventory</h3>
-                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item, Colore, Grade, Batch No, SQM.</p>
+                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item, Color, Grade, Batch No, SQM.</p>
                     <form id="resetInventoryForm">
                         <div class="flex items-center gap-4">
                             <input type="file" id="inventoryFile" name="inventoryFile" accept=".csv" required class="block w-full text-sm secondary-text file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"/>
@@ -321,15 +321,17 @@
 
         // --- Data Fetching Functions ---
         let localInventory = [];
-        const fetchInventory = async (searchTerm = '') => {
+        const fetchInventory = async (searchParams = {}) => {
             showLoading();
             try {
-                const url = searchTerm ? `/api/inventory/search?q=${encodeURIComponent(searchTerm)}` : '/api/inventory';
+                const query = new URLSearchParams(searchParams).toString();
+                const url = `/api/inventory?${query}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch inventory');
-                localInventory = await response.json();
-                renderInventoryTable(localInventory);
-                // updateDashboard();
+                const inventoryData = await response.json();
+                localInventory = inventoryData; // Update global inventory
+                renderInventoryTable(inventoryData);
+                updateDashboard(inventoryData);
             } catch (error) {
                 console.error('Fetch Error:', error);
                 showToast('Error loading inventory.', true);
@@ -351,71 +353,21 @@
             const logs = await response.json();
             renderLogTable(logs);
         };
-
-        const updateDashboard = () => {
-                totalProductsElement.textContent = localInventory.length;
-                totalStockElement.textContent = localInventory.reduce((sum, item) => sum + item.sqm, 0).toFixed(2);
-                outOfStockElement.textContent = localInventory.filter(item => item.sqm <= 0).length;
-            };
-
-        // --- DOM Elements ---
-            const inventoryTableBody = document.getElementById('inventory-table-body');
-            const inventoryTableContainer = document.querySelector('#inventory-page .table-container');
-            const noItemsMessage = document.getElementById('noItemsMessage');
-            const addFirstItemBtn = document.getElementById('addFirstItemBtn');
-            const addItemBtn = document.getElementById('addItemBtn');
-            const itemModal = document.getElementById('itemModal');
-            const closeModal = document.getElementById('closeModal');
-            const cancelItem = document.getElementById('cancelItem');
-            const itemForm = document.getElementById('itemForm');
-            const searchInput = document.getElementById('searchInput');
-            const totalProductsElement = document.getElementById('totalProducts');
-            const totalStockElement = document.getElementById('totalStock');
-            const outOfStockElement = document.getElementById('outOfStock');
-            const modalTitle = document.getElementById('modalTitle');
-            const saveItemBtn = document.getElementById('saveItemBtn');
-            const actionsHeader = document.getElementById('actionsHeader');
-            const resetInventoryForm = document.getElementById('resetInventoryForm');
-            const inventoryFile = document.getElementById('inventoryFile');
-            const logoutBtn = document.getElementById('logoutBtn');
-
-
-            const openModalForEdit = (itemId) => {
-                const item = localInventory.find(i => i.id === itemId);
-                if (item) {
-                    modalTitle.textContent = 'Edit Product';
-                    saveItemBtn.textContent = 'Save Changes';
-                    document.getElementById('itemId').value = item.id;
-                    document.getElementById('itemItem').value = item.item;
-                    document.getElementById('itemColore').value = item.colore;
-                    document.getElementById('itemGrade').value = item.grade;
-                    document.getElementById('itemBatchNo').value = item.batch_no;
-                    document.getElementById('itemSqm').value = item.sqm;
-                    itemModal.classList.remove('hidden');
-                }
-            };
-
-            const openModalForAdd = () => {
-                modalTitle.textContent = 'Add New Product';
-                saveItemBtn.textContent = 'Add Product';
-                itemForm.reset();
-                document.getElementById('itemId').value = '';
-                itemModal.classList.remove('hidden');
-            };
-
-            const closeModalFunc = () => itemModal.classList.add('hidden');
         
         // --- Rendering Functions ---
         const renderInventoryTable = (inventoryData) => {
             const inventoryTableBody = document.getElementById('inventory-table-body');
+            const inventoryTableContainer = document.querySelector('#inventory-page .table-container');
+            const noItemsMessage = document.getElementById('noItemsMessage');
+
             inventoryTableBody.innerHTML = '';
             if (!inventoryData || inventoryData.length === 0) {
-                document.querySelector('#inventory-page .table-container').classList.add('hidden');
-                document.getElementById('noItemsMessage').classList.remove('hidden');
+                inventoryTableContainer.classList.add('hidden');
+                noItemsMessage.classList.remove('hidden');
                 return;
             }
-            document.querySelector('#inventory-page .table-container').classList.remove('hidden');
-            document.getElementById('noItemsMessage').classList.add('hidden');
+            inventoryTableContainer.classList.remove('hidden');
+            noItemsMessage.classList.add('hidden');
             inventoryData.forEach(item => {
                 const row = document.createElement('tr');
                 const statusClass = item.sqm <= 0 ? 'status-out-of-stock' : 'status-in-stock';
@@ -429,7 +381,7 @@
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item.sr_no}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.item}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.colore}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.color}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.grade}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.batch_no}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.sqm}</td>
@@ -486,6 +438,15 @@
             });
         };
 
+        const updateDashboard = (inventoryData) => {
+            const totalProductsElement = document.getElementById('totalProducts');
+            const totalStockElement = document.getElementById('totalStock');
+            const outOfStockElement = document.getElementById('outOfStock');
+            totalProductsElement.textContent = inventoryData.length;
+            totalStockElement.textContent = inventoryData.reduce((sum, item) => sum + item.sqm, 0).toFixed(2);
+            outOfStockElement.textContent = inventoryData.filter(item => item.sqm <= 0).length;
+        };
+        
         document.addEventListener('DOMContentLoaded', () => {
             // --- Tab Management ---
             const tabs = document.querySelectorAll('.tab-btn');
@@ -514,59 +475,67 @@
             const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
             const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
             const themeToggleBtn = document.getElementById('theme-toggle');
-            
-            // if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            //     document.documentElement.classList.add('dark');
-            //     if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
-            // } else {
-            //     document.documentElement.classList.remove('dark');
-            //     if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
-            // }
-
             const headerLogo = document.getElementById('header-logo');
             const lightLogoUrl = "{{ url_for('static', filename='media/lightmode.png') }}";
             const darkLogoUrl = "{{ url_for('static', filename='media/darkmode.png') }}";
 
-            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
-                if(headerLogo) headerLogo.src = darkLogoUrl; // Add this line
-            } else {
-                document.documentElement.classList.remove('dark');
-                if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
-                if(headerLogo) headerLogo.src = lightLogoUrl; // Add this line
-            }
-
-            themeToggleBtn.addEventListener('click', function() {
-                themeToggleDarkIcon.classList.toggle('hidden');
-                themeToggleLightIcon.classList.toggle('hidden');
-                if (localStorage.getItem('color-theme')) {
-                    if (localStorage.getItem('color-theme') === 'light') {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('color-theme', 'dark');
-                    } else {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('color-theme', 'light');
-                    }
-                } else {
-                    if (document.documentElement.classList.contains('dark')) {
-                        document.documentElement.classList.remove('dark');
-                        localStorage.setItem('color-theme', 'light');
-                    } else {
-                        document.documentElement.classList.add('dark');
-                        localStorage.setItem('color-theme', 'dark');
-                    }
-                }
-
-                 // This is the new code that updates the logo after the theme changes
-                if (document.documentElement.classList.contains('dark')) {
+            const applyTheme = () => {
+                if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                    if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+                    if(themeToggleDarkIcon) themeToggleDarkIcon.classList.add('hidden');
                     if(headerLogo) headerLogo.src = darkLogoUrl;
                 } else {
+                    document.documentElement.classList.remove('dark');
+                    if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+                    if(themeToggleLightIcon) themeToggleLightIcon.classList.add('hidden');
                     if(headerLogo) headerLogo.src = lightLogoUrl;
                 }
+            };
+            
+            themeToggleBtn.addEventListener('click', function() {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+                applyTheme();
             });
 
-            
+            // --- DOM Elements ---
+            const addItemBtn = document.getElementById('addItemBtn');
+            const addFirstItemBtn = document.getElementById('addFirstItemBtn');
+            const itemModal = document.getElementById('itemModal');
+            const closeModal = document.getElementById('closeModal');
+            const cancelItem = document.getElementById('cancelItem');
+            const itemForm = document.getElementById('itemForm');
+            const searchInputs = document.querySelectorAll('.search-input');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            const actionsHeader = document.getElementById('actionsHeader');
+            const resetInventoryForm = document.getElementById('resetInventoryForm');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            const openModalForEdit = (itemId) => {
+                const item = localInventory.find(i => i.id === itemId);
+                if (item) {
+                    document.getElementById('modalTitle').textContent = 'Edit Product';
+                    document.getElementById('saveItemBtn').textContent = 'Save Changes';
+                    document.getElementById('itemId').value = item.id;
+                    document.getElementById('itemItem').value = item.item;
+                    document.getElementById('itemColor').value = item.color;
+                    document.getElementById('itemGrade').value = item.grade;
+                    document.getElementById('itemBatchNo').value = item.batch_no;
+                    document.getElementById('itemSqm').value = item.sqm;
+                    itemModal.classList.remove('hidden');
+                }
+            };
+
+            const openModalForAdd = () => {
+                document.getElementById('modalTitle').textContent = 'Add New Product';
+                document.getElementById('saveItemBtn').textContent = 'Add Product';
+                itemForm.reset();
+                document.getElementById('itemId').value = '';
+                itemModal.classList.remove('hidden');
+            };
+
+            const closeModalFunc = () => itemModal.classList.add('hidden');
 
             logoutBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -574,7 +543,19 @@
                 window.location.href = '/';
             });
 
-            searchInput.addEventListener('input', () => fetchInventory(searchInput.value));
+            searchInputs.forEach(input => input.addEventListener('input', () => {
+                const searchParams = {};
+                searchInputs.forEach(i => {
+                    const key = i.id.replace('search-', '');
+                    if (i.value) searchParams[key] = i.value;
+                });
+                fetchInventory(searchParams);
+            }));
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInputs.forEach(input => input.value = '');
+                fetchInventory();
+            });
             
             if(isAdminOrDirector){
                 addItemBtn.addEventListener('click', openModalForAdd);
@@ -588,7 +569,7 @@
                     const isEdit = !!itemId;
                     const itemData = {
                         item: document.getElementById('itemItem').value,
-                        colore: document.getElementById('itemColore').value,
+                        color: document.getElementById('itemColor').value,
                         grade: document.getElementById('itemGrade').value,
                         batch_no: document.getElementById('itemBatchNo').value,
                         sqm: document.getElementById('itemSqm').value,
@@ -614,10 +595,11 @@
                     }
                 });
 
-                inventoryTableBody.addEventListener('click', async (e) => {
-                    const action = e.target.dataset.action;
-                    if(!action) return;
-                    const itemId = parseInt(e.target.dataset.id);
+                document.getElementById('inventory-table-body').addEventListener('click', async (e) => {
+                    const target = e.target.closest('button');
+                    if(!target) return;
+                    const action = target.dataset.action;
+                    const itemId = parseInt(target.dataset.id);
                     if (action === 'edit') {
                         openModalForEdit(itemId);
                     }
@@ -639,7 +621,7 @@
                 if (resetInventoryForm) {
                     resetInventoryForm.addEventListener('submit', async (e) => {
                         e.preventDefault();
-                        const file = inventoryFile.files[0];
+                        const file = document.getElementById('inventoryFile').files[0];
                         if (!file) {
                             showToast('Please select a file to upload.', true);
                             return;
@@ -673,7 +655,6 @@
             }
 
             if (isDirector) {
-                const usersTableBody = document.getElementById('users-table-body');
                 const addUserBtn = document.getElementById('addUserBtn');
                 const userModal = document.getElementById('userModal');
                 const closeUserModal = document.getElementById('closeUserModal');
@@ -742,10 +723,11 @@
                     }
                 });
 
-                usersTableBody.addEventListener('click', async (e) => {
-                    const action = e.target.dataset.action;
-                    if (!action) return;
-                    const userId = parseInt(e.target.dataset.id, 10);
+                document.getElementById('users-table-body').addEventListener('click', async (e) => {
+                    const target = e.target.closest('button');
+                    if (!target) return;
+                    const action = target.dataset.action;
+                    const userId = parseInt(target.dataset.id, 10);
                     if (userId === CURRENT_USER_ID) return;
 
                     if (action === 'edit-user') {
@@ -753,7 +735,7 @@
                     }
 
                     if (action === 'toggle-status') {
-                        const currentStatus = e.target.dataset.status;
+                        const currentStatus = target.dataset.status;
                         const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
                         await fetch(`/api/users/${userId}/status`, {
                             method: 'PUT',
@@ -784,6 +766,7 @@
             };
             
             setupUIForRole();
+            applyTheme();
             fetchInventory();
             if (isDirector) {
                 fetchUsers();
