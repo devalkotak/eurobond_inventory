@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='media/favicon.png') }}">
     <title>EUROBOND Inventory Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -35,7 +36,9 @@
         <header class="header shadow-sm sticky top-0 z-40 border-b">
             <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <div class="flex items-center">
-                    <img src="https://placehold.co/160x40/23262F/FFFFFF?text=EUROBOND" alt="EUROBOND Logo" class="w-40 mr-4">
+                    <img id="header-logo" src="" alt="EUROBOND Logo" class="w-40 mr-4">
+                    <!-- <img src="{{ url_for('static', filename='media/lightmode.png') }}" alt="EUROBOND Logo LIGHT" class="w-40 mr-4 block dark:hidden">
+                    <img src="{{ url_for('static', filename='media/darkmode.png') }}" alt="EUROBOND Logo DARK" class="w-40 mr-4 hidden dark:block"> -->
                     <h1 class="text-2xl font-bold main-text hidden md:block">Dashboard</h1>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -68,7 +71,7 @@
 
             <!-- Inventory Page Content -->
             <div id="inventory-page" class="tab-content">
-                <div class="mb-8">
+                <!-- <div class="mb-8">
                     <h2 class="text-2xl font-semibold main-text mb-4">Inventory Overview</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="dashboard-card rounded-xl p-6">
@@ -105,7 +108,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="mb-8">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
@@ -326,7 +329,7 @@
                 if (!response.ok) throw new Error('Failed to fetch inventory');
                 localInventory = await response.json();
                 renderInventoryTable(localInventory);
-                updateDashboard();
+                // updateDashboard();
             } catch (error) {
                 console.error('Fetch Error:', error);
                 showToast('Error loading inventory.', true);
@@ -512,12 +515,26 @@
             const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
             const themeToggleBtn = document.getElementById('theme-toggle');
             
+            // if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            //     document.documentElement.classList.add('dark');
+            //     if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+            // } else {
+            //     document.documentElement.classList.remove('dark');
+            //     if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+            // }
+
+            const headerLogo = document.getElementById('header-logo');
+            const lightLogoUrl = "{{ url_for('static', filename='media/lightmode.png') }}";
+            const darkLogoUrl = "{{ url_for('static', filename='media/darkmode.png') }}";
+
             if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
                 if(themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+                if(headerLogo) headerLogo.src = darkLogoUrl; // Add this line
             } else {
                 document.documentElement.classList.remove('dark');
                 if(themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+                if(headerLogo) headerLogo.src = lightLogoUrl; // Add this line
             }
 
             themeToggleBtn.addEventListener('click', function() {
@@ -539,6 +556,13 @@
                         document.documentElement.classList.add('dark');
                         localStorage.setItem('color-theme', 'dark');
                     }
+                }
+
+                 // This is the new code that updates the logo after the theme changes
+                if (document.documentElement.classList.contains('dark')) {
+                    if(headerLogo) headerLogo.src = darkLogoUrl;
+                } else {
+                    if(headerLogo) headerLogo.src = lightLogoUrl;
                 }
             });
 

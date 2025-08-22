@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EUROBOND Inventory Management</title>
+    <link rel="icon" href="{{ url_for('static', filename='media/favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
@@ -52,7 +53,7 @@
 
     <div id="loginModal" class="min-h-screen flex items-center justify-center">
         <div class="login-card rounded-xl p-10 max-w-lg w-full mx-4 shadow-2xl">
-            <img src="https://placehold.co/192x48/181A20/FFFFFF?text=EUROBOND" alt="EUROBOND Logo" class="mx-auto mb-8 w-48">
+            <img id="login-logo" src="" alt="EUROBOND Logo" class="mx-auto mb-8 w-48">
             <h2 class="text-3xl font-bold text-center mb-6">Warehouse Inventory Login</h2>
             <form id="loginForm" class="space-y-6">
                 <div>
@@ -72,43 +73,35 @@
     </div>
 
     <script>
-        // Dark Mode Toggle Logic
+        // --- Theme & Logo Management ---
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            themeToggleLightIcon.classList.remove('hidden');
-        } else {
-            document.documentElement.classList.remove('dark');
-            themeToggleDarkIcon.classList.remove('hidden');
-        }
-
         const themeToggleBtn = document.getElementById('theme-toggle');
-        themeToggleBtn.addEventListener('click', function() {
-            themeToggleDarkIcon.classList.toggle('hidden');
-            themeToggleLightIcon.classList.toggle('hidden');
+        const loginLogo = document.getElementById('login-logo');
+        const lightLogoUrl = "{{ url_for('static', filename='media/lightmode.png') }}";
+        const darkLogoUrl = "{{ url_for('static', filename='media/darkmode.png') }}";
 
-            if (localStorage.getItem('color-theme')) {
-                if (localStorage.getItem('color-theme') === 'light') {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                }
+        const applyTheme = () => {
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+                loginLogo.src = darkLogoUrl;
             } else {
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                }
+                document.documentElement.classList.remove('dark');
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+                loginLogo.src = lightLogoUrl;
             }
+        };
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+            applyTheme();
         });
 
-        // Login Form Logic
+        // --- Login Form Logic ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
@@ -135,6 +128,9 @@
                 console.error('Login Error:', error);
             }
         });
+        
+        // --- Initial Load ---
+        applyTheme();
     </script>
 </body>
 </html>

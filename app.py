@@ -352,9 +352,9 @@ def get_logs():
 
 if __name__ == '__main__':
     if not os.path.exists(INVENTORY_DB):
-        init_db(INVENTORY_DB, 'schema/schema_inventory.sql')
+        init_db(INVENTORY_DB, 'static/schema/schema_inventory.sql')
     if not os.path.exists(USERS_DB):
-        init_db(USERS_DB, 'schema/schema_users.sql')
+        init_db(USERS_DB, 'static/schema/schema_users.sql')
     if not os.path.exists(LOG_DB):
-        init_db(LOG_DB, 'schema/schema_log.sql')
+        init_db(LOG_DB, 'static/schema/schema_log.sql')
     app.run(debug=True)
