@@ -7,7 +7,7 @@ import io
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'your_very_secret_key_final_v3' # Change this in a real application
+app.secret_key = 'your_very_secret_key_final_v4' # Change this in a real application
 
 # --- Session Cookie Configuration for Security ---
 app.config.update(
@@ -228,7 +228,7 @@ def get_inventory():
     
     db = get_db(INVENTORY_DB)
     
-    base_query = 'SELECT id, item, color, grade, batch_no, sqm FROM inventory'
+    base_query = 'SELECT id, item, color, grade, batch_no, sqm, remark FROM inventory'
     conditions = []
     params = []
     
@@ -260,8 +260,8 @@ def add_inventory_item():
         return jsonify({"error": "Forbidden"}), 403
     data = request.get_json()
     db = get_db(INVENTORY_DB)
-    cur = db.execute('INSERT INTO inventory (item, color, grade, batch_no, sqm) VALUES (?, ?, ?, ?, ?)',
-                     [data['item'], data['color'], data['grade'], data['batch_no'], float(data['sqm'])])
+    cur = db.execute('INSERT INTO inventory (item, color, grade, batch_no, sqm, remark) VALUES (?, ?, ?, ?, ?, ?)',
+                     [data['item'], data['color'], data['grade'], data['batch_no'], float(data['sqm']), data.get('remark')])
     db.commit()
     new_id = cur.lastrowid
     log_action("INVENTORY_ADD", f"Added new item (ID: {new_id}) with details: {data}.")
@@ -279,8 +279,8 @@ def update_inventory_item(item_id):
     if not old_item:
         return jsonify({"error": "Item not found"}), 404
 
-    db.execute('UPDATE inventory SET item = ?, color = ?, grade = ?, batch_no = ?, sqm = ? WHERE id = ?',
-               [data['item'], data['color'], data['grade'], data['batch_no'], float(data['sqm']), item_id])
+    db.execute('UPDATE inventory SET item = ?, color = ?, grade = ?, batch_no = ?, sqm = ?, remark = ? WHERE id = ?',
+               [data['item'], data['color'], data['grade'], data['batch_no'], float(data['sqm']), data.get('remark'), item_id])
     db.commit()
     log_action("INVENTORY_UPDATE", f"Updated item ID {item_id}. Old: {dict(old_item)}, New: {data}")
     updated_item = db.execute('SELECT * FROM inventory WHERE id = ?', [item_id]).fetchone()
@@ -315,9 +315,9 @@ def reset_inventory():
         csv_reader = csv.reader(stream)
         next(csv_reader, None) # Skip header
         
-        new_items = [(row[0], row[1], row[2], row[3], float(row[4])) for row in csv_reader if len(row) == 5]
+        new_items = [(row[0], row[1], row[2], row[3], float(row[4]), row[5] if len(row) > 5 else None) for row in csv_reader if len(row) >= 5]
         
-        db.executemany('INSERT INTO inventory (item, color, grade, batch_no, sqm) VALUES (?, ?, ?, ?, ?)', new_items)
+        db.executemany('INSERT INTO inventory (item, color, grade, batch_no, sqm, remark) VALUES (?, ?, ?, ?, ?, ?)', new_items)
         db.commit()
         log_action("INVENTORY_RESET", f"Reset inventory with {len(new_items)} items from file '{file.filename}'.")
         return jsonify({"success": True, "message": f"Inventory reset with {len(new_items)} items."})

@@ -50,11 +50,11 @@
             </div>
         </header>
 
-        <main class="flex-1 max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 w-full">
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Tabs -->
             <div class="mb-8">
                 <div class="border-b border-color">
-                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                    <nav class="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
                         <button id="inventory-tab" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600 dark:text-blue-400">Inventory</button>
                         {% if user_role in ['admin', 'director'] %}
                         <button id="reset-tab" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent secondary-text hover:border-gray-300 dark:hover:border-gray-600">Reset Inventory</button>
@@ -71,14 +71,14 @@
             <div id="inventory-page" class="tab-content">
                 <div class="mb-8">
                     <h2 class="text-2xl font-semibold main-text mb-4">Inventory Overview</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="dashboard-card rounded-xl p-6">
                             <div class="flex items-center">
                                 <div class="p-3 rounded-full bg-slate-700 text-cyan-400 mr-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                                 </div>
                                 <div>
-                                    <h3 class="secondary-text text-sm font-medium">Total Unique Products</h3>
+                                    <h3 class="secondary-text text-sm font-medium">Displayed Products</h3>
                                     <p id="totalProducts" class="text-3xl font-bold main-text">0</p>
                                 </div>
                             </div>
@@ -89,19 +89,8 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
                                 </div>
                                 <div>
-                                    <h3 class="secondary-text text-sm font-medium">Total Stock (SQM)</h3>
+                                    <h3 class="secondary-text text-sm font-medium">Displayed Stock (SQM)</h3>
                                     <p id="totalStock" class="text-3xl font-bold main-text">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dashboard-card rounded-xl p-6">
-                            <div class="flex items-center">
-                                 <div class="p-3 rounded-full bg-slate-700 text-red-400 mr-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-                                </div>
-                                <div>
-                                    <h3 class="secondary-text text-sm font-medium">Out of Stock Products</h3>
-                                    <p id="outOfStock" class="text-3xl font-bold main-text">0</p>
                                 </div>
                             </div>
                         </div>
@@ -117,7 +106,7 @@
                         </div>
                     </div>
                     
-                    <div id="search-container" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div id="search-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                         <input type="text" id="search-item" placeholder="Search Item..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                         <input type="text" id="search-color" placeholder="Search Color..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                         <input type="text" id="search-grade" placeholder="Search Grade..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
@@ -154,6 +143,10 @@
                                     <label for="itemSqm" class="block text-sm font-medium secondary-text">SQM</label>
                                     <input type="number" id="itemSqm" min="0" step="0.01" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
+                                <div>
+                                    <label for="itemRemark" class="block text-sm font-medium secondary-text">Remark</label>
+                                    <input type="text" id="itemRemark" class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
+                                </div>
                                 <div class="flex justify-end space-x-3 mt-6">
                                     <button type="button" id="cancelItem" class="px-4 py-2 border border-color rounded-md text-sm font-medium secondary-text hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Cancel</button>
                                     <button type="submit" id="saveItemBtn" class="px-4 py-2 border border-transparent rounded-md text-sm font-medium btn-primary">Add Product</button>
@@ -174,7 +167,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Grade</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Batch No</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">SQM</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Remark</th>
                                     <th id="actionsHeader" scope="col" class="px-6 py-3 text-right text-xs font-semibold secondary-text uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -198,7 +191,7 @@
             <div id="reset-page" class="tab-content hidden">
                 <div id="resetSection" class="p-6 reset-section shadow rounded-xl border-l-4 border-red-500">
                     <h3 class="text-lg font-semibold main-text mb-2">Reset Inventory</h3>
-                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item, Color, Grade, Batch No, SQM.</p>
+                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item, Color, Grade, Batch No, SQM, Remark.</p>
                     <form id="resetInventoryForm">
                         <div class="flex items-center gap-4">
                             <input type="file" id="inventoryFile" name="inventoryFile" accept=".csv" required class="block w-full text-sm secondary-text file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"/>
@@ -295,160 +288,156 @@
     </div>
 
     <script>
-        const USER_ROLE = "{{ user_role }}";
-        const CURRENT_USER_ID = parseInt("{{ user_id }}", 10);
-        const isDirector = USER_ROLE === 'director';
-        const isAdminOrDirector = ['admin', 'director'].includes(USER_ROLE);
-
-        // --- Global Scope Functions ---
-        const showLoading = () => document.getElementById('loadingIndicator').classList.remove('hidden');
-        const hideLoading = () => document.getElementById('loadingIndicator').classList.add('hidden');
-
-        const showToast = (message, isError = false) => {
-            const toast = document.createElement('div');
-            const bgColor = isError ? 'bg-red-600' : 'bg-green-600';
-            toast.className = `fixed top-6 right-6 z-50 ${bgColor} text-white px-4 py-2 rounded-md shadow-lg opacity-0 transition-all duration-300 transform translate-x-full`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.remove('opacity-0', 'translate-x-full');
-            }, 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-x-full');
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 3000);
-        };
-
-        // --- Data Fetching Functions ---
-        let localInventory = [];
-        const fetchInventory = async (searchParams = {}) => {
-            showLoading();
-            try {
-                const query = new URLSearchParams(searchParams).toString();
-                const url = `/api/inventory?${query}`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch inventory');
-                const inventoryData = await response.json();
-                localInventory = inventoryData; // Update global inventory
-                renderInventoryTable(inventoryData);
-                updateDashboard(inventoryData);
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                showToast('Error loading inventory.', true);
-            } finally {
-                hideLoading();
-            }
-        };
-
-        const fetchUsers = async () => {
-            if (!isDirector) return;
-            const response = await fetch('/api/users');
-            const users = await response.json();
-            renderUsersTable(users);
-        };
-
-        const fetchLogs = async () => {
-            if (!isDirector) return;
-            const response = await fetch('/api/logs');
-            const logs = await response.json();
-            renderLogTable(logs);
-        };
-        
-        // --- Rendering Functions ---
-        const renderInventoryTable = (inventoryData) => {
-            const inventoryTableBody = document.getElementById('inventory-table-body');
-            const inventoryTableContainer = document.querySelector('#inventory-page .table-container');
-            const noItemsMessage = document.getElementById('noItemsMessage');
-
-            inventoryTableBody.innerHTML = '';
-            if (!inventoryData || inventoryData.length === 0) {
-                inventoryTableContainer.classList.add('hidden');
-                noItemsMessage.classList.remove('hidden');
-                return;
-            }
-            inventoryTableContainer.classList.remove('hidden');
-            noItemsMessage.classList.add('hidden');
-            inventoryData.forEach(item => {
-                const row = document.createElement('tr');
-                const statusClass = item.sqm <= 0 ? 'status-out-of-stock' : 'status-in-stock';
-                const statusText = item.sqm <= 0 ? 'Out of Stock' : 'In Stock';
-                const actionsCell = isAdminOrDirector 
-                    ? `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                            <button data-action="edit" data-id="${item.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
-                            <button data-action="delete" data-id="${item.id}" class="text-red-400 hover:text-red-300">Delete</button>
-                       </td>`
-                    : '<td class="px-6 py-4"></td>';
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item.sr_no}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.item}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.color}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.grade}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.batch_no}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.sqm}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
-                    </td>
-                    ${actionsCell}
-                `;
-                inventoryTableBody.appendChild(row);
-            });
-        };
-
-        const renderUsersTable = (users) => {
-            const usersTableBody = document.getElementById('users-table-body');
-            usersTableBody.innerHTML = '';
-            users.forEach(user => {
-                const isCurrentUser = user.id === CURRENT_USER_ID;
-                const row = document.createElement('tr');
-                const actionButtons = isCurrentUser
-                    ? `<span class="text-sm secondary-text pr-6"> (Current User)</span>`
-                    : `<button data-action="edit-user" data-id="${user.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
-                       <button data-action="toggle-status" data-id="${user.id}" data-status="${user.status}" class="text-yellow-400 hover:text-yellow-300">
-                           ${user.status === 'active' ? 'Suspend' : 'Activate'}
-                       </button>
-                       <button data-action="delete-user" data-id="${user.id}" class="text-red-400 hover:text-red-300">Delete</button>`;
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${user.username}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${user.role}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'status-active' : 'status-suspended'}">
-                            ${user.status}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                        ${actionButtons}
-                    </td>
-                `;
-                usersTableBody.appendChild(row);
-            });
-        };
-
-        const renderLogTable = (logs) => {
-            const logTableBody = document.getElementById('log-table-body');
-            logTableBody.innerHTML = '';
-            logs.forEach(log => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${new Date(log.timestamp).toLocaleString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${log.username}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${log.action.replace(/_/g, ' ')}</td>
-                    <td class="px-6 py-4 text-sm secondary-text">${log.details}</td>
-                `;
-                logTableBody.appendChild(row);
-            });
-        };
-
-        const updateDashboard = (inventoryData) => {
-            const totalProductsElement = document.getElementById('totalProducts');
-            const totalStockElement = document.getElementById('totalStock');
-            const outOfStockElement = document.getElementById('outOfStock');
-            totalProductsElement.textContent = inventoryData.length;
-            totalStockElement.textContent = inventoryData.reduce((sum, item) => sum + item.sqm, 0).toFixed(2);
-            outOfStockElement.textContent = inventoryData.filter(item => item.sqm <= 0).length;
-        };
-        
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Tab Management ---
+            const USER_ROLE = "{{ user_role }}";
+            const CURRENT_USER_ID = parseInt("{{ user_id }}", 10);
+            const isDirector = USER_ROLE === 'director';
+            const isAdminOrDirector = ['admin', 'director'].includes(USER_ROLE);
+
+            // --- Global Scope Functions ---
+            const showLoading = () => document.getElementById('loadingIndicator').classList.remove('hidden');
+            const hideLoading = () => document.getElementById('loadingIndicator').classList.add('hidden');
+
+            const showToast = (message, isError = false) => {
+                const toast = document.createElement('div');
+                const bgColor = isError ? 'bg-red-600' : 'bg-green-600';
+                toast.className = `fixed top-6 right-6 z-50 ${bgColor} text-white px-4 py-2 rounded-md shadow-lg opacity-0 transition-all duration-300 transform translate-x-full`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.remove('opacity-0', 'translate-x-full');
+                }, 10);
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-x-full');
+                    setTimeout(() => document.body.removeChild(toast), 300);
+                }, 3000);
+            };
+
+            // --- Data Fetching Functions ---
+            let localInventory = [];
+            const fetchInventory = async (searchParams = {}) => {
+                showLoading();
+                try {
+                    const query = new URLSearchParams(searchParams).toString();
+                    const url = `/api/inventory?${query}`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to fetch inventory');
+                    const inventoryData = await response.json();
+                    localInventory = inventoryData; // Update global inventory
+                    renderInventoryTable(inventoryData);
+                    updateDashboard(inventoryData);
+                } catch (error) {
+                    console.error('Fetch Error:', error);
+                    showToast('Error loading inventory.', true);
+                } finally {
+                    hideLoading();
+                }
+            };
+
+            const fetchUsers = async () => {
+                if (!isDirector) return;
+                const response = await fetch('/api/users');
+                const users = await response.json();
+                renderUsersTable(users);
+            };
+
+            const fetchLogs = async () => {
+                if (!isDirector) return;
+                const response = await fetch('/api/logs');
+                const logs = await response.json();
+                renderLogTable(logs);
+            };
+            
+            // --- Rendering Functions ---
+            const renderInventoryTable = (inventoryData) => {
+                const inventoryTableBody = document.getElementById('inventory-table-body');
+                const inventoryTableContainer = document.querySelector('#inventory-page .table-container');
+                const noItemsMessage = document.getElementById('noItemsMessage');
+
+                inventoryTableBody.innerHTML = '';
+                if (!inventoryData || inventoryData.length === 0) {
+                    inventoryTableContainer.classList.add('hidden');
+                    noItemsMessage.classList.remove('hidden');
+                    return;
+                }
+                inventoryTableContainer.classList.remove('hidden');
+                noItemsMessage.classList.add('hidden');
+                inventoryData.forEach(item => {
+                    const row = document.createElement('tr');
+                    const actionsCell = isAdminOrDirector 
+                        ? `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                <button data-action="edit" data-id="${item.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
+                                <button data-action="delete" data-id="${item.id}" class="text-red-400 hover:text-red-300">Delete</button>
+                           </td>`
+                        : '<td class="px-6 py-4"></td>';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${item.sr_no}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.item}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.color}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.grade}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.batch_no}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.sqm}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${item.remark || ''}</td>
+                        ${actionsCell}
+                    `;
+                    inventoryTableBody.appendChild(row);
+                });
+            };
+
+            const renderUsersTable = (users) => {
+                const usersTableBody = document.getElementById('users-table-body');
+                usersTableBody.innerHTML = '';
+                users.forEach(user => {
+                    const isCurrentUser = user.id === CURRENT_USER_ID;
+                    const row = document.createElement('tr');
+                    const actionButtons = isCurrentUser
+                        ? `<span class="text-sm secondary-text pr-6"> (Current User)</span>`
+                        : `<button data-action="edit-user" data-id="${user.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
+                           <button data-action="toggle-status" data-id="${user.id}" data-status="${user.status}" class="text-yellow-400 hover:text-yellow-300">
+                               ${user.status === 'active' ? 'Suspend' : 'Activate'}
+                           </button>
+                           <button data-action="delete-user" data-id="${user.id}" class="text-red-400 hover:text-red-300">Delete</button>`;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium main-text">${user.username}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${user.role}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'status-active' : 'status-suspended'}">
+                                ${user.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                            ${actionButtons}
+                        </td>
+                    `;
+                    usersTableBody.appendChild(row);
+                });
+            };
+
+            const renderLogTable = (logs) => {
+                const logTableBody = document.getElementById('log-table-body');
+                logTableBody.innerHTML = '';
+                logs.forEach(log => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${new Date(log.timestamp).toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm main-text">${log.username}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm secondary-text">${log.action.replace(/_/g, ' ')}</td>
+                        <td class="px-6 py-4 text-sm secondary-text">${log.details}</td>
+                    `;
+                    logTableBody.appendChild(row);
+                });
+            };
+
+            const updateDashboard = (inventoryData) => {
+                const totalProductsElement = document.getElementById('totalProducts');
+                const totalStockElement = document.getElementById('totalStock');
+                const outOfStockElement = document.getElementById('outOfStock');
+                totalProductsElement.textContent = inventoryData.length;
+                totalStockElement.textContent = inventoryData.reduce((sum, item) => sum + item.sqm, 0).toFixed(2);
+                outOfStockElement.textContent = inventoryData.filter(item => item.sqm <= 0).length;
+            };
+            
+            // --- Event Listeners and Initial Setup ---
             const tabs = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
 
@@ -471,7 +460,6 @@
                 });
             });
 
-            // --- Theme Management ---
             const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
             const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
             const themeToggleBtn = document.getElementById('theme-toggle');
@@ -499,7 +487,6 @@
                 applyTheme();
             });
 
-            // --- DOM Elements ---
             const addItemBtn = document.getElementById('addItemBtn');
             const addFirstItemBtn = document.getElementById('addFirstItemBtn');
             const itemModal = document.getElementById('itemModal');
@@ -523,6 +510,7 @@
                     document.getElementById('itemGrade').value = item.grade;
                     document.getElementById('itemBatchNo').value = item.batch_no;
                     document.getElementById('itemSqm').value = item.sqm;
+                    document.getElementById('itemRemark').value = item.remark;
                     itemModal.classList.remove('hidden');
                 }
             };
@@ -573,6 +561,7 @@
                         grade: document.getElementById('itemGrade').value,
                         batch_no: document.getElementById('itemBatchNo').value,
                         sqm: document.getElementById('itemSqm').value,
+                        remark: document.getElementById('itemRemark').value
                     };
                     const url = isEdit ? `/api/inventory/${itemId}` : '/api/inventory';
                     const method = isEdit ? 'PUT' : 'POST';
