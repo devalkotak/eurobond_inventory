@@ -107,8 +107,8 @@
                     </div>
 
                     <div id="search-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <input type="text" id="search-item" placeholder="Search Item Code..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
-                        <input type="text" id="search-color" placeholder="Search Color Code..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                        <input type="text" id="search-item" placeholder="Search Color Code..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                        <input type="text" id="search-color" placeholder="Search Color..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                         <input type="text" id="search-grade" placeholder="Search Grade..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                         <input type="text" id="search-batch_no" placeholder="Search Batch No..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                     </div>
@@ -124,11 +124,11 @@
                             <form id="itemForm" class="space-y-4">
                                 <input type="hidden" id="itemId">
                                 <div>
-                                    <label for="itemItem" class="block text-sm font-medium secondary-text">Item Code</label>
+                                    <label for="itemItem" class="block text-sm font-medium secondary-text">Color Code</label>
                                     <input type="text" id="itemItem" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
-                                    <label for="itemColor" class="block text-sm font-medium secondary-text">Color Code</label>
+                                    <label for="itemColor" class="block text-sm font-medium secondary-text">Color</label>
                                     <input type="text" id="itemColor" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
@@ -191,7 +191,7 @@
             <div id="reset-page" class="tab-content hidden">
                 <div id="resetSection" class="p-6 reset-section shadow rounded-xl border-l-4 border-red-500">
                     <h3 class="text-lg font-semibold main-text mb-2">Reset Inventory</h3>
-                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item Code, Color Code, Grade, Batch No, SQM, Remark.</p>
+                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Color Code, Color, Grade, Batch No, SQM, Remark.</p>
                     <form id="resetInventoryForm">
                         <div class="flex items-center gap-4">
                             <input type="file" id="inventoryFile" name="inventoryFile" accept=".csv" required class="block w-full text-sm secondary-text file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"/>
