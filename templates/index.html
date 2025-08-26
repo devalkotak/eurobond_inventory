@@ -105,10 +105,10 @@
                             <button id="clearSearchBtn" class="text-sm font-medium secondary-text hover:text-white transition-colors duration-200 py-2 px-4 rounded-md border border-color hover:bg-gray-100 dark:hover:bg-gray-700">Clear Search</button>
                         </div>
                     </div>
-                    
+
                     <div id="search-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <input type="text" id="search-item" placeholder="Search Item..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
-                        <input type="text" id="search-color" placeholder="Search Color..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                        <input type="text" id="search-item" placeholder="Search Item Code..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
+                        <input type="text" id="search-color" placeholder="Search Color Code..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                         <input type="text" id="search-grade" placeholder="Search Grade..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                         <input type="text" id="search-batch_no" placeholder="Search Batch No..." class="search-input px-4 py-2 border border-color rounded-md" style="background-color: var(--input-bg-color);">
                     </div>
@@ -124,11 +124,11 @@
                             <form id="itemForm" class="space-y-4">
                                 <input type="hidden" id="itemId">
                                 <div>
-                                    <label for="itemItem" class="block text-sm font-medium secondary-text">Item</label>
+                                    <label for="itemItem" class="block text-sm font-medium secondary-text">Item Code</label>
                                     <input type="text" id="itemItem" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
-                                    <label for="itemColor" class="block text-sm font-medium secondary-text">Color</label>
+                                    <label for="itemColor" class="block text-sm font-medium secondary-text">Color Code</label>
                                     <input type="text" id="itemColor" required class="mt-1 block w-full px-3 py-2 border border-color rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" style="background-color: var(--input-bg-color);">
                                 </div>
                                 <div>
@@ -162,8 +162,8 @@
                             <thead class="table-header">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Sr No.</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Item</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Color</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Item Code</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Color Code</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Grade</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">Batch No</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold secondary-text uppercase tracking-wider">SQM</th>
@@ -175,7 +175,7 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <div id="noItemsMessage" class="hidden mt-12 text-center">
                      <div class="mx-auto w-24 h-24 secondary-text">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4m0-4.003L12 12m0 0l-8.384 4.192M12 12l8.384 4.192" /></svg>
@@ -191,7 +191,7 @@
             <div id="reset-page" class="tab-content hidden">
                 <div id="resetSection" class="p-6 reset-section shadow rounded-xl border-l-4 border-red-500">
                     <h3 class="text-lg font-semibold main-text mb-2">Reset Inventory</h3>
-                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item, Color, Grade, Batch No, SQM, Remark.</p>
+                    <p class="text-sm secondary-text mb-4">Warning: This will delete all current inventory and replace it with the contents of the uploaded CSV file. The CSV must have the columns: Item Code, Color Code, Grade, Batch No, SQM, Remark.</p>
                     <form id="resetInventoryForm">
                         <div class="flex items-center gap-4">
                             <input type="file" id="inventoryFile" name="inventoryFile" accept=".csv" required class="block w-full text-sm secondary-text file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"/>
@@ -257,7 +257,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Audit Log Page Content -->
             {% if user_role == 'director' %}
             <div id="log-page" class="tab-content hidden">
@@ -347,7 +347,7 @@
                 const logs = await response.json();
                 renderLogTable(logs);
             };
-            
+
             // --- Rendering Functions ---
             const renderInventoryTable = (inventoryData) => {
                 const inventoryTableBody = document.getElementById('inventory-table-body');
@@ -364,7 +364,7 @@
                 noItemsMessage.classList.add('hidden');
                 inventoryData.forEach(item => {
                     const row = document.createElement('tr');
-                    const actionsCell = isAdminOrDirector 
+                    const actionsCell = isAdminOrDirector
                         ? `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                 <button data-action="edit" data-id="${item.id}" class="text-blue-400 hover:text-blue-300">Edit</button>
                                 <button data-action="delete" data-id="${item.id}" class="text-red-400 hover:text-red-300">Delete</button>
@@ -431,12 +431,12 @@
             const updateDashboard = (inventoryData) => {
                 const totalProductsElement = document.getElementById('totalProducts');
                 const totalStockElement = document.getElementById('totalStock');
-                const outOfStockElement = document.getElementById('outOfStock');
+                //const outOfStockElement = document.getElementById('outOfStock');
                 totalProductsElement.textContent = inventoryData.length;
                 totalStockElement.textContent = inventoryData.reduce((sum, item) => sum + item.sqm, 0).toFixed(2);
-                outOfStockElement.textContent = inventoryData.filter(item => item.sqm <= 0).length;
+                //outOfStockElement.textContent = inventoryData.filter(item => item.sqm <= 0).length;
             };
-            
+
             // --- Event Listeners and Initial Setup ---
             const tabs = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
@@ -449,7 +449,7 @@
                     });
                     tab.classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
                     tab.classList.remove('border-transparent', 'secondary-text');
-                    
+
                     const targetPageId = tab.id.replace('-tab', '-page');
                     tabContents.forEach(content => {
                         content.classList.toggle('hidden', content.id !== targetPageId);
@@ -480,7 +480,7 @@
                     if(headerLogo) headerLogo.src = lightLogoUrl;
                 }
             };
-            
+
             themeToggleBtn.addEventListener('click', function() {
                 const isDark = document.documentElement.classList.toggle('dark');
                 localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
@@ -544,7 +544,7 @@
                 searchInputs.forEach(input => input.value = '');
                 fetchInventory();
             });
-            
+
             if(isAdminOrDirector){
                 addItemBtn.addEventListener('click', openModalForAdd);
                 addFirstItemBtn.addEventListener('click', openModalForAdd);
@@ -653,7 +653,7 @@
                 const saveUserBtn = document.getElementById('saveUserBtn');
                 const newPasswordInput = document.getElementById('newPassword');
                 const editUserIdInput = document.getElementById('editUserId');
-                
+
                 const openUserModalForAdd = () => {
                     userForm.reset();
                     editUserIdInput.value = '';
@@ -744,7 +744,7 @@
                     }
                 });
             }
-            
+
             // --- Initial Load ---
             const setupUIForRole = () => {
                 if (!isAdminOrDirector) {
@@ -753,7 +753,7 @@
                     if(actionsHeader) actionsHeader.style.display = 'none';
                 }
             };
-            
+
             setupUIForRole();
             applyTheme();
             fetchInventory();
